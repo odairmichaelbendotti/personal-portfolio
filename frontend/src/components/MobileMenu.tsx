@@ -3,7 +3,7 @@ import type { SidebarProps } from "./Sidebar";
 
 const MobileMenu = ({ setView, view }: SidebarProps) => {
   const navItems = [
-    { text: "About me", Icon: User },
+    { text: "About", Icon: User },
     { text: "Skills", Icon: Award },
     { text: "Experience", Icon: Briefcase },
     { text: "Projects", Icon: FolderGit2 },

@@ -8,7 +8,13 @@ import Projects from "../components/Content/Projects";
 import Contact from "../components/Content/Contact";
 
 export const Resume = () => {
-  const [view, setView] = useState<string>("About me");
+  const [view, setView] = useState<string>(() => {
+    // Initialize based on current window width
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768 ? "About" : "About me";
+    }
+    return "About me";
+  });
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -45,7 +51,7 @@ export const Resume = () => {
         )}
 
         <main className="h-full w-full md:w-200">
-          {view === "About me" && <About />}
+          {(view === "About me" || view === "About") && <About />}
           {view === "Skills" && <Skills />}
           {view === "Experience" && <Experience />}
           {view === "Projects" && <Projects />}
