@@ -367,7 +367,7 @@ const FeaturedProjectCard = ({
       />
 
       {/* Content */}
-      <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full min-h-[240px]">
+      <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full min-h-60">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -487,7 +487,7 @@ const CompactProjectCard = ({
       />
 
       {/* Content */}
-      <div className="relative z-10 p-3 flex flex-col h-full min-h-[120px]">
+      <div className="relative z-10 p-3 flex flex-col h-full min-h-30">
         {/* Header */}
         <div className="flex items-start justify-between mb-2">
           <span className="text-[10px] font-mono text-gray-500">
@@ -572,7 +572,7 @@ const ProjectCard = ({
       />
 
       {/* Content */}
-      <div className="relative z-10 p-4 flex flex-col h-full min-h-[160px]">
+      <div className="relative z-10 p-4 flex flex-col h-full min-h-40">
         {/* Header */}
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2">
