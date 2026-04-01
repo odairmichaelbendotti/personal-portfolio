@@ -32,7 +32,7 @@ export const Resume = () => {
   }, []);
 
   return (
-    <div className="relative min-h-dvh h-dvh md:min-h-screen md:h-screen bg-background w-full flex justify-center items-center">
+    <div className="relative min-h-dvh h-dvh md:min-h-screen md:h-screen bg-background w-full flex md:flex-row justify-center items-center">
       <>
         {isMobile ? (
           <MobileMenu
@@ -49,15 +49,15 @@ export const Resume = () => {
             setTheme={setTheme}
           />
         )}
-
-        <main className="h-full w-full md:w-200">
-          {(view === "About me" || view === "About") && <About />}
-          {view === "Skills" && <Skills />}
-          {view === "Experience" && <Experience />}
-          {view === "Projects" && <Projects />}
-          {view === "Contact" && <Contact />}
-        </main>
       </>
+
+      <main className="h-full md:h-auto w-full md:w-200">
+        {(view === "About me" || view === "About") && <About />}
+        {view === "Skills" && <Skills />}
+        {view === "Experience" && <Experience />}
+        {view === "Projects" && <Projects />}
+        {view === "Contact" && <Contact />}
+      </main>
     </div>
   );
 };
