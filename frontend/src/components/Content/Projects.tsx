@@ -22,7 +22,7 @@ const GitHubIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type ProjectCategory = "All" | "Full Stack" | "Frontend" | "Backend" | "Mobile";
+type ProjectCategory = "All" | "Full Stack" | "Frontend" | "Backend";
 
 interface Project {
   id: number;
@@ -120,7 +120,7 @@ const projects: Project[] = [
     description: "App bancário com biometria e PIX",
     longDescription:
       "Aplicativo mobile de serviços bancários com autenticação biométrica, integração PIX, extrato em tempo real, transferências, pagamento de boletos e cartão virtual.",
-    category: "Mobile",
+    category: "Frontend",
     tech: ["React Native", "Node.js", "PostgreSQL", "AWS"],
     github: "https://github.com",
     color: "from-neutral-600/20 to-neutral-800/20",
@@ -150,7 +150,6 @@ const categories: ProjectCategory[] = [
   "Full Stack",
   "Frontend",
   "Backend",
-  "Mobile",
 ];
 
 const categoryIcons = {
@@ -158,7 +157,6 @@ const categoryIcons = {
   "Full Stack": Code2,
   Frontend: Sparkles,
   Backend: Cpu,
-  Mobile: Folder,
 };
 
 // Mapeamento de tecnologias para ícones

@@ -278,11 +278,13 @@ const AchievementCard = ({
 const ExperienceGroup = ({
   group,
   index,
+  defaultExpanded = false,
 }: {
   group: (typeof achievementGroups)[0];
   index: number;
+  defaultExpanded?: boolean;
 }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const Icon = group.icon;
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -413,7 +415,12 @@ const Experience = () => {
             className="space-y-1"
           >
             {achievementGroups.map((group, index) => (
-              <ExperienceGroup key={group.title} group={group} index={index} />
+              <ExperienceGroup
+                key={group.title}
+                group={group}
+                index={index}
+                defaultExpanded={index === 0}
+              />
             ))}
           </motion.div>
         </div>

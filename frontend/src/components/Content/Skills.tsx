@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import ContentLayout from "./Layout/ContentLayout";
 import { motion, AnimatePresence } from "motion/react";
+import {
+  Wrench,
+  Server,
+  Layout,
+  Database,
+  Cloud,
+  ChevronRight,
+  Code2,
+} from "lucide-react";
 
 type CategorySkill =
   | "Backend"
@@ -16,6 +25,32 @@ const categories: CategorySkill[] = [
   "Database",
   "Infrastructure",
 ];
+
+const categoryConfig: Record<
+  Exclude<CategorySkill, "All">,
+  { icon: React.ElementType; color: string; description: string }
+> = {
+  Backend: {
+    icon: Server,
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+    description: "Node.js, APIs REST, arquitetura de microsserviços",
+  },
+  Frontend: {
+    icon: Layout,
+    color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
+    description: "React, interfaces responsivas, state management",
+  },
+  Database: {
+    icon: Database,
+    color: "bg-green-500/10 text-green-400 border-green-500/30",
+    description: "SQL, NoSQL, caching, otimização de queries",
+  },
+  Infrastructure: {
+    icon: Cloud,
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+    description: "Docker, cloud services, CI/CD, devops",
+  },
+};
 
 type Skill = {
   name: string;
@@ -199,21 +234,106 @@ const SkillCard = ({ skill }: { skill: Skill }) => {
         />
         {/* Tooltip inside card - Desktop only */}
         <motion.div
-          animate={{
-            opacity: isHovered ? 1 : 0,
-          }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="hidden sm:flex items-center justify-center text-center px-2 z-50"
+          className="hidden md:flex items-center justify-center text-center px-2 z-50"
         >
           <p className="text-xs font-semibold text-accent leading-tight">
             {skill.name}
           </p>
         </motion.div>
       </motion.div>
-      {/* Name visible on mobile */}
-      <p className="text-xs text-center mt-2 sm:hidden text-gray-200 font-semibold leading-tight h-8 flex items-center justify-center w-full">
+      {/* Name visible on mobile/tablet */}
+      <p className="text-xs text-center mt-2 md:hidden text-gray-200 font-semibold leading-tight h-8 flex items-center justify-center w-full">
         {skill.name}
       </p>
+    </motion.div>
+  );
+};
+
+// Mobile Category Card Component
+const MobileCategoryCard = ({
+  category,
+  skills,
+  isExpanded,
+  onToggle,
+}: {
+  category: Exclude<CategorySkill, "All">;
+  skills: Skill[];
+  isExpanded: boolean;
+  onToggle: () => void;
+}) => {
+  const config = categoryConfig[category];
+  const Icon = config.icon;
+  const topSkills = skills.slice(0, 4);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="border border-default-border rounded-sm overflow-hidden bg-card-background/30"
+    >
+      <button
+        onClick={onToggle}
+        className={`w-full flex items-center justify-between p-3 ${config.color} border-b border-default-border/50`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 border border-current/30 bg-background/50 flex items-center justify-center rounded-sm">
+            <Icon className="w-5 h-5" />
+          </div>
+          <div className="text-left">
+            <h3 className="text-sm font-semibold">{category}</h3>
+            <p className="text-[10px] opacity-80 mt-0.5">
+              {skills.length} technologies
+            </p>
+          </div>
+        </div>
+        <motion.div
+          animate={{ rotate: isExpanded ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronRight className="w-5 h-5" />
+        </motion.div>
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="p-3 bg-background/50">
+              {/* Top Skills Icons */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {topSkills.map((skill) => (
+                  <div
+                    key={skill.name}
+                    className="flex items-center gap-1.5 px-2 py-1.5 bg-background border border-default-border/50 rounded-sm"
+                  >
+                    <img
+                      src={skill.path}
+                      alt={skill.name}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-xs text-gray-300">{skill.name}</span>
+                  </div>
+                ))}
+                {skills.length > 4 && (
+                  <div className="flex items-center px-2 py-1.5 text-xs text-gray-500">
+                    +{skills.length - 4} more
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                {config.description}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -222,6 +342,10 @@ const Skills = () => {
   const [hoverCategory, setHoverCategory] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<CategorySkill>("All");
   const [filteredSkills, setFilteredSkills] = useState<Skill[]>(skillList);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState<Exclude<
+    CategorySkill,
+    "All"
+  > | null>("Backend");
 
   useEffect(() => {
     function handleFilterSkills() {
@@ -237,13 +361,27 @@ const Skills = () => {
     handleFilterSkills();
   }, [activeCategory]);
 
+  // Group skills by category for mobile view
+  const skillsByCategory = {
+    Backend: skillList.filter((s) => s.category === "Backend"),
+    Frontend: skillList.filter((s) => s.category === "Frontend"),
+    Database: skillList.filter((s) => s.category === "Database"),
+    Infrastructure: skillList.filter((s) => s.category === "Infrastructure"),
+  };
+
+  const toggleMobileCategory = (category: Exclude<CategorySkill, "All">) => {
+    setExpandedMobileCategory(
+      expandedMobileCategory === category ? null : category,
+    );
+  };
+
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col md:flex-row">
+      <div className="h-full w-full flex flex-col md:flex-row min-h-0">
         {/* Skill filter */}
-        <div className="flex flex-col w-full md:flex-1">
+        <div className="flex flex-col w-full md:flex-1 min-h-0">
           {/* Desktop Filter */}
-          <div className="hidden md:flex">
+          <div className="hidden md:flex shrink-0">
             <div className="flex border border-default-border text-gray-300 text-sm">
               {categories.map((label) => (
                 <button
@@ -269,31 +407,55 @@ const Skills = () => {
             </div>
           </div>
 
-          {/* Mobile Filter - Dropdown */}
-          <div className="md:hidden p-4 border-b border-default-border bg-linear-to-r from-background to-accent-third/10">
-            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-              Filter by category
-            </label>
-            <select
-              value={activeCategory}
-              onChange={(e) =>
-                setActiveCategory(e.target.value as CategorySkill)
-              }
-              className="w-full px-4 py-3 bg-background border-2 border-default-border text-gray-200 text-base font-medium rounded-sm cursor-pointer focus:outline-none focus:border-accent transition-all duration-300 hover:border-accent-third"
-              aria-label="Filter skills by category"
+          {/* Mobile View - Header + Category Cards */}
+          <div className="md:hidden flex flex-col min-h-0 overflow-hidden">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="border-b border-default-border/50 p-4 bg-linear-to-r from-background to-accent-third/5 shrink-0"
             >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat === "All" ? "All categories" : cat}
-                </option>
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-12 h-12 border border-accent/30 bg-accent/10 flex items-center justify-center rounded-sm shrink-0">
+                  <Wrench className="w-6 h-6 text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg font-bold text-accent mb-1">
+                    Technical Skills
+                  </h2>
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <Code2 className="w-3 h-3" />
+                    <span>{skillList.length} technologies</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Full-stack expertise with focus on backend architecture and
+                scalable systems.
+              </p>
+            </motion.div>
+
+            {/* Mobile Category Cards */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-20">
+              {(
+                Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]
+              ).map((category) => (
+                <MobileCategoryCard
+                  key={category}
+                  category={category}
+                  skills={skillsByCategory[category]}
+                  isExpanded={expandedMobileCategory === category}
+                  onToggle={() => toggleMobileCategory(category)}
+                />
               ))}
-            </select>
+            </div>
           </div>
 
-          {/* Skills content with scroll on mobile */}
-          <div className="flex flex-col h-full md:flex-1 md:max-h-none overflow-y-auto">
+          {/* Desktop Skills content */}
+          <div className="hidden md:flex flex-col flex-1 min-h-0 overflow-y-auto">
             <div className="w-full flex-1 p-4 sm:p-6">
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
+              <div className="grid grid-cols-4 md:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
                 <AnimatePresence mode="popLayout">
                   {filteredSkills.map((skill) => (
                     <SkillCard
@@ -311,6 +473,7 @@ const Skills = () => {
             </div>
           </div>
         </div>
+
         {/* Expertise Panel - Desktop only */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}

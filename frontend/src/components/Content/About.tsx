@@ -110,7 +110,7 @@ const About = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-background pb-20 md:pb-0">
         {/* HERO SECTION - Compact */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

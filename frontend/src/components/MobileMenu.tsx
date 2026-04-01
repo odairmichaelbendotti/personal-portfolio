@@ -18,14 +18,11 @@ const MobileMenu = ({ setView, view }: SidebarProps) => {
     <div className="absolute bg-accent-third z-10 border-default-border text-white bottom-2 right-1/2 translate-x-[50%] w-[95%] grid grid-cols-5 px-3 py-0.5 rounded-lg">
       {navItems.map((item, index) => (
         <div
+          onClick={() => setView(item.text)}
           key={index}
           className="flex flex-col items-center justify-center p-2"
         >
-          <item.Icon
-            size={20}
-            className={activeClass(item.text)}
-            onClick={() => setView(item.text)}
-          />
+          <item.Icon size={20} className={activeClass(item.text)} />
           <span className={`text-xs mt-1 ${activeClass(item.text)}`}>
             {item.text}
           </span>
