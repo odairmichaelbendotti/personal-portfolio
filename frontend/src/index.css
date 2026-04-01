@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@custom-variant light (&:where(.light, .light *));
+
+.hachura {
+  background-image: repeating-linear-gradient(
+    45deg,
+    #10171b,
+    1px,
+    transparent 0,
+    transparent 50%
+  );
+  background-size: 8px 8px;
+}
+
+.quadriculado {
+  background-image:
+    linear-gradient(#10171b 0.5px, transparent 1px),
+    linear-gradient(90deg, #10171b 1px, transparent 1px);
+
+  background-size: 15px 15px;
+}
+
+@font-face {
+  font-family: "inter";
+  src: url("../fonts/Inter.ttf") format("truetype");
+}
+
+@theme {
+  --color-background: #090a0b;
+  --color-card-background: #1a1a1a;
+  --color-accent: #40cbf6;
+  --color-accent-secondary: #246277;
+  --color-accent-third: #10171b;
+  --color-text-secondary: #99a4ac;
+
+  --color-default-border: #1a1a1a;
+  --color-secondary: #6c757d;
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  --color-info: #17a2b8;
+  --color-light: #f8f9fa;
+  --color-dark: #343a40;
+
+  --font-inter: "inter", sans-serif;
+}
+
+@variant light {
+  --color-default-border: #dee2e6;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 5px;
+  border: 2px solid var(--color-background);
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2ab8d9;
+}
+
+/* Firefox */
+* {
+  scrollbar-color: var(--color-accent) var(--color-background);
+  scrollbar-width: thin;
+}
