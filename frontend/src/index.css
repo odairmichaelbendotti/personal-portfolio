@@ -60,12 +60,17 @@
 
 body {
   font-family: var(--font-inter);
+  overflow-x: hidden;
 }
 
-/* Scrollbar styling */
+/* Também desabilitar scroll horizontal no html */
+html {
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling - apenas vertical */
 ::-webkit-scrollbar {
   width: 10px;
-  height: 10px;
 }
 
 ::-webkit-scrollbar-track {

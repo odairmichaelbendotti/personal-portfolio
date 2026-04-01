@@ -802,7 +802,7 @@ const Projects = () => {
         </motion.div>
 
         {/* Projects Grid */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 pb-20 sm:pb-5">
           {filteredProjects.length > 0 ? (
             <div className="flex flex-col gap-4">
               {/* Row 1: Featured Project + Side Project (apenas na view All) */}
@@ -880,7 +880,7 @@ const Projects = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="px-4 sm:px-5 py-3 border-t border-default-border bg-linear-to-r from-accent-third/10 to-background"
+          className="px-4 sm:px-5 py-3 border-t border-default-border bg-linear-to-r from-accent-third/10 to-background pb-20 sm:pb-3"
         >
           <div className="flex items-center justify-between text-xs text-gray-400">
             <span>

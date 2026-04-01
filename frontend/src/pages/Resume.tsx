@@ -26,7 +26,7 @@ export const Resume = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen h-screen md:h-full bg-background w-full flex justify-center items-center">
+    <div className="relative min-h-dvh h-dvh md:min-h-screen md:h-screen bg-background w-full flex justify-center items-center">
       <>
         {isMobile ? (
           <MobileMenu

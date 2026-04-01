@@ -265,7 +265,6 @@ const MobileCategoryCard = ({
 }) => {
   const config = categoryConfig[category];
   const Icon = config.icon;
-  const topSkills = skills.slice(0, 4);
 
   return (
     <motion.div
@@ -306,9 +305,8 @@ const MobileCategoryCard = ({
             className="overflow-hidden"
           >
             <div className="p-3 bg-background/50">
-              {/* Top Skills Icons */}
               <div className="flex flex-wrap gap-2 mb-3">
-                {topSkills.map((skill) => (
+                {skills.map((skill) => (
                   <div
                     key={skill.name}
                     className="flex items-center gap-1.5 px-2 py-1.5 bg-background border border-default-border/50 rounded-sm"
@@ -321,11 +319,6 @@ const MobileCategoryCard = ({
                     <span className="text-xs text-gray-300">{skill.name}</span>
                   </div>
                 ))}
-                {skills.length > 4 && (
-                  <div className="flex items-center px-2 py-1.5 text-xs text-gray-500">
-                    +{skills.length - 4} more
-                  </div>
-                )}
               </div>
               <p className="text-xs text-gray-400 leading-relaxed">
                 {config.description}
@@ -408,7 +401,7 @@ const Skills = () => {
           </div>
 
           {/* Mobile View - Header + Category Cards */}
-          <div className="md:hidden flex flex-col min-h-0 overflow-hidden">
+          <div className="md:hidden flex flex-col min-h-0 overflow-hidden overflow-x-hidden">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: -15 }}
@@ -437,7 +430,7 @@ const Skills = () => {
             </motion.div>
 
             {/* Mobile Category Cards */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 pb-20">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 pb-20">
               {(
                 Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]
               ).map((category) => (
