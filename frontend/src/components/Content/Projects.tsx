@@ -159,7 +159,7 @@ const categoryIcons = {
   Backend: Cpu,
 };
 
-// Mapeamento de tecnologias para ícones
+// --- Inicia  o mapeamento de tecnologias para ícones ---
 const techIconMap: Record<string, string> = {
   "Next.js": "./icons/frontend/nextjs.svg",
   React: "./icons/frontend/react.svg",
@@ -198,8 +198,9 @@ const TechIcon = ({ tech }: { tech: string }) => {
     </div>
   );
 };
+// *** Termina o Mapeamento de tecnologias para ícones ***
 
-// Card lateral para o segundo projeto
+// --- Inicia o Card lateral para o segundo projeto ---
 const SideProjectCard = ({
   project,
   onSelect,
@@ -316,8 +317,9 @@ const SideProjectCard = ({
     </motion.div>
   );
 };
+// *** Termina o Card lateral para o segundo projeto ***
 
-// Card principal maior (primeiro projeto)
+// --- Inicia o Card principal maior (primeiro projeto) ---
 const FeaturedProjectCard = ({
   project,
   onSelect,
@@ -444,8 +446,9 @@ const FeaturedProjectCard = ({
     </motion.div>
   );
 };
+// *** Termina o Card principal maior (primeiro projeto) ***
 
-// Card compacto para filtros de categoria
+// --- Inicia o Card compacto para filtros de categoria ---
 const CompactProjectCard = ({
   project,
   index,
@@ -529,8 +532,9 @@ const CompactProjectCard = ({
     </motion.div>
   );
 };
+// *** Termina o Card compacto para filtros de categoria ***
 
-// Card padrão para os demais projetos (All view)
+// --- Inicia o Card padrão para os demais projetos (All view) ---
 const ProjectCard = ({
   project,
   index,

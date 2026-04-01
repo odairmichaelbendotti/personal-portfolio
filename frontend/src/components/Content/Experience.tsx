@@ -167,7 +167,7 @@ const TechIcon = ({ tech }: { tech: string }) => {
         />
       </div>
       {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-card-background border border-default-border/50 rounded-sm opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-10">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-card-background border border-default-border/50 rounded-sm opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-1">
         <span className="text-[10px] text-gray-300">{tech}</span>
         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-card-background" />
       </div>
@@ -253,7 +253,7 @@ const AchievementCard = ({
               className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-accent"
             />
 
-            <div className="relative z-10">
+            <div className="relative z-1">
               <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-2">
                 {achievement.text}
                 <span className="font-semibold text-accent ml-0.5">

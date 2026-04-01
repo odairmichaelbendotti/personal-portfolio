@@ -15,7 +15,7 @@ const MobileMenu = ({ setView, view }: SidebarProps) => {
   }
 
   return (
-    <div className="absolute bg-accent-third z-10 border-default-border text-white bottom-2 right-1/2 translate-x-[50%] w-[95%] grid grid-cols-5 px-3 py-0.5 rounded-lg">
+    <div className="absolute bg-accent-third z-50 border-default-border text-white bottom-2 right-1/2 translate-x-[50%] w-[95%] grid grid-cols-5 px-3 py-0.5 rounded-lg">
       {navItems.map((item, index) => (
         <div
           onClick={() => setView(item.text)}
