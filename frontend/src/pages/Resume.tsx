@@ -32,7 +32,7 @@ export const Resume = () => {
   }, []);
 
   return (
-    <div className="relative min-h-dvh h-dvh md:min-h-screen md:h-screen bg-background w-full flex md:flex-row justify-center items-center">
+    <div className="relative min-h-dvh h-dvh md:min-h-screen md:h-screen w-full flex md:flex-row justify-center items-center">
       <>
         {isMobile ? (
           <MobileMenu

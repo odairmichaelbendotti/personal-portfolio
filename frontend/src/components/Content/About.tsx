@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import ContentLayout from "./Layout/ContentLayout";
-import { motion, AnimatePresence } from "framer-motion";
-import { User, Bot, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 const chatData = {
   greeting:
@@ -9,30 +8,35 @@ const chatData = {
   questions: [
     {
       id: 1,
+      label: "Especialidade",
       question: "Qual é sua especialidade?",
       answer:
         "Minha especialidade está em transformar requisitos complexos em sistemas elegantes e performáticos, mantendo o código limpo e facilitando futuras manutenções.",
     },
     {
       id: 2,
+      label: "Stack",
       question: "Em quais tecnologias você trabalha?",
       answer:
         "Trabalho com React/Next.js no frontend, Node.js no backend, TypeScript, banco de dados, Docker e CI/CD. Tenho experiência completa em full stack.",
     },
     {
       id: 3,
+      label: "Abordagem",
       question: "Como você aborda um novo projeto?",
       answer:
         "Começo entendendo os requisitos e o contexto, desenho a arquitetura focando em escalabilidade, depois implemento com code review e testes. Sempre pensando no usuário final.",
     },
     {
       id: 4,
+      label: "Filosofia",
       question: "Qual é sua filosofia de desenvolvimento?",
       answer:
         "Código limpo, legível e testável. Toda decisão técnica deve considerar manutenibilidade futura e impacto na experiência do usuário. Aprendizado contínuo é fundamental.",
     },
     {
       id: 5,
+      label: "Projetos",
       question: "Quantos projetos você já desenvolveu?",
       answer:
         "Mais de 50 projetos concluídos, desde MVPs até aplicações em produção com milhares de usuários. Cada projeto me ensinou algo novo.",
@@ -40,257 +44,257 @@ const chatData = {
   ],
 };
 
-const TypingAnimation = () => (
-  <motion.div className="flex gap-1 items-center px-1">
-    {[0, 1, 2].map((i) => (
-      <motion.div
-        key={i}
-        className="w-1.5 h-1.5 bg-accent rounded-full"
-        animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-      />
-    ))}
-  </motion.div>
-);
+
+type TranscriptEntry = {
+  id: number;
+  question: string;
+  answer: string;
+};
+
+const QuestionPill = ({
+  question,
+  index,
+  onSelect,
+  disabled,
+}: {
+  question: (typeof chatData.questions)[0];
+  index: number;
+  onSelect: () => void;
+  disabled: boolean;
+}) => {
+  const [hovered, setHovered] = useState(false);
+  const num = String(question.id).padStart(2, "0");
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8, x: -10 }}
+      transition={{ duration: 0.2, delay: index * 0.06 }}
+      onClick={onSelect}
+      disabled={disabled}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm font-mono text-[10px] transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+        hovered
+          ? "border-accent/50 bg-accent/5 text-accent"
+          : "border-default-border bg-background text-gray-300"
+      }`}
+    >
+      <span className="relative inline-block w-4 shrink-0">
+        <span
+          className={`absolute inset-0 flex items-center justify-center transition-all duration-150 ${
+            hovered ? "opacity-100 text-accent" : "opacity-0 text-accent"
+          }`}
+        >
+          →
+        </span>
+        <span
+          className={`flex items-center justify-center transition-all duration-150 ${
+            hovered ? "opacity-0 text-accent" : "opacity-100 text-accent/60"
+          }`}
+        >
+          {num}
+        </span>
+      </span>
+      <span>{question.label}</span>
+    </motion.button>
+  );
+};
 
 const About = () => {
-  const [messages, setMessages] = useState<
-    Array<{ type: "bot" | "user"; text: string }>
-  >([]);
-  const [availableQuestions, setAvailableQuestions] = useState<
-    typeof chatData.questions
-  >(chatData.questions);
-  const [isLoadingGreeting, setIsLoadingGreeting] = useState(true);
-  const [isLoadingResponse, setIsLoadingResponse] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
+  const [availableQuestions, setAvailableQuestions] = useState(chatData.questions);
+  const [isTyping, setIsTyping] = useState(false);
+  const [pillKey, setPillKey] = useState(0);
+  const transcriptEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll automático para o final do chat
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoadingResponse]);
+    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [transcript, isTyping]);
 
-  // Carrega saudação ao montar o componente (sempre reinicia as perguntas)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMessages([{ type: "bot", text: chatData.greeting }]);
-      setIsLoadingGreeting(false);
-    }, 1500);
+  const handleSelect = (question: (typeof chatData.questions)[0]) => {
+    setIsTyping(true);
+    setAvailableQuestions((prev) => prev.filter((q) => q.id !== question.id));
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleSelectQuestion = (question: (typeof chatData.questions)[0]) => {
-    // Add user message
-    setMessages((prev) => [...prev, { type: "user", text: question.question }]);
-
-    // Show loading
-    setIsLoadingResponse(true);
-
-    // Simulate typing delay
     setTimeout(() => {
-      setMessages((prev) => [...prev, { type: "bot", text: question.answer }]);
-
-      // Update available questions
-      const updatedQuestions = availableQuestions.filter(
-        (q) => q.id !== question.id,
-      );
-      setAvailableQuestions(updatedQuestions);
-
-      setIsLoadingResponse(false);
-    }, 800);
+      setTranscript((prev) => [
+        ...prev,
+        { id: question.id, question: question.question, answer: question.answer },
+      ]);
+      setIsTyping(false);
+    }, 750);
   };
 
-  const handleResetChat = () => {
-    // Reset state
-    setMessages([{ type: "bot", text: chatData.greeting }]);
+  const handleReset = () => {
+    setTranscript([]);
+    setIsTyping(false);
+    setPillKey((k) => k + 1);
     setAvailableQuestions(chatData.questions);
-    setIsLoadingGreeting(false);
-    setIsLoadingResponse(false);
   };
+
+  const answeredCount = chatData.questions.length - availableQuestions.length;
 
   return (
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-background pb-20 md:pb-0">
-        {/* HERO SECTION - Compact */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="px-2 sm:px-3 pt-2 pb-1.5 border-b border-default-border/50"
-        >
-          <div className="relative border border-default-border bg-linear-to-br from-background via-background to-accent-third/10 p-2.5 sm:p-3 rounded-sm overflow-hidden">
-            <motion.div
-              className="absolute inset-0 opacity-10"
-              style={{
-                backgroundImage:
-                  "radial-gradient(circle at 20% 50%, rgba(64, 203, 246, 0.1) 0%, transparent 50%)",
-              }}
-            />
 
-            <div className="relative z-10 flex items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h1 className="text-xl sm:text-2xl font-bold text-accent leading-tight">
-                    Olá, sou Odair
-                  </h1>
-                  {/* Indicador online */}
-                  <span className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 border border-green-500/30 rounded-full">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-[10px] text-green-500 font-medium">
-                      online
-                    </span>
-                  </span>
-                </div>
-                <p className="text-xs sm:text-sm text-gray-300 truncate">
-                  6+ anos criando experiências digitais • Brasil
-                </p>
-              </div>
-
-              {/* Reset Button */}
-              <motion.button
-                onClick={handleResetChat}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-sm border border-accent/30 bg-accent/5 flex items-center justify-center hover:border-accent/50 hover:bg-accent/10 transition-all duration-300 cursor-pointer group"
-                title="Reiniciar conversa"
-                aria-label="Reiniciar conversa"
-              >
-                <motion.div
-                  whileHover={{ rotate: 180 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <RefreshCw
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-accent group-hover:text-accent"
-                    strokeWidth={1.5}
-                  />
-                </motion.div>
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* CHAT SECTION */}
-        <div className="flex-1 flex flex-col overflow-hidden p-2 sm:p-3 gap-2">
-          {/* Messages Container */}
+        {/* Zone 1 — Identity Block */}
+        <div className="shrink-0 px-4 sm:px-6 pt-5 sm:pt-6 pb-4">
           <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <h1 className="leading-tight">
+              <span className="text-3xl sm:text-4xl font-black tracking-tight text-accent">Odair</span>
+              <span className="text-3xl sm:text-4xl font-light tracking-wide text-white/40 ml-2">Michael Bendotti</span>
+            </h1>
+          </motion.div>
+
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="flex-1 flex flex-col gap-2.5 overflow-y-auto scrollbar-hide"
+            transition={{ duration: 0.3, delay: 0.15 }}
+            className="mt-1.5 text-[10px] sm:text-xs text-text-secondary uppercase tracking-widest font-medium"
           >
-            <AnimatePresence>
-              {isLoadingGreeting && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex justify-start"
-                >
-                  <div className="px-3 py-2 rounded-sm border border-accent/30 bg-accent/10">
-                    <TypingAnimation />
-                  </div>
-                </motion.div>
-              )}
-              {messages.map((msg, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className={`flex items-end gap-2 ${msg.type === "bot" ? "justify-start" : "justify-end"}`}
-                >
-                  {/* Avatar do bot */}
-                  {msg.type === "bot" && (
-                    <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-accent/10 border border-accent/30 flex items-center justify-center">
-                      <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-                    </div>
-                  )}
+            Full-stack Software Engineer
+          </motion.p>
 
-                  <div
-                    className={`max-w-[75%] sm:max-w-[70%] px-3 py-2.5 rounded-sm text-xs sm:text-sm leading-relaxed border ${
-                      msg.type === "bot"
-                        ? "bg-accent/10 border-accent/30 text-gray-200 rounded-bl-none"
-                        : "bg-green-500/15 border-green-500/40 text-white rounded-br-none"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.28 }}
+            className="mt-3 text-xs text-gray-400 leading-relaxed"
+          >
+            <span className="text-accent font-mono font-semibold">6+</span>
+            <span className="text-gray-600 mx-1.5">anos</span>
+            <span className="text-gray-700 mx-1">·</span>
+            <span className="text-accent font-mono font-semibold mx-1.5">50+</span>
+            <span className="text-gray-600">projetos</span>
+            <span className="text-gray-700 mx-2">·</span>
+            Arquiteto de sistemas e interfaces, apaixonado por
+            performance e experiências que escalam.
+          </motion.p>
 
-                  {/* Avatar do user */}
-                  {msg.type === "user" && (
-                    <div className="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-green-500/10 border border-green-500/30 flex items-center justify-center">
-                      <User className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-                    </div>
-                  )}
-                </motion.div>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.6, delay: 0.38, ease: "easeOut" }}
+            style={{ originX: 0 }}
+            className="mt-4 h-px bg-linear-to-r from-accent/40 via-default-border to-transparent"
+          />
+        </div>
+
+        {/* Zone 2 — Transcript */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
+          className="flex-1 overflow-y-auto scrollbar-hide px-4 sm:px-6 py-3 flex flex-col gap-3"
+        >
+          {transcript.length === 0 && !isTyping && (
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-xs font-mono text-text-secondary">
+                <span className="text-accent animate-pulse">▍</span>
+                {" "}// selecione uma pergunta abaixo
+              </p>
+            </div>
+          )}
+
+          <AnimatePresence>
+            {transcript.map((entry, i) => (
+              <motion.div
+                key={entry.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.25 }}
+                className="flex flex-col gap-0"
+              >
+                {i > 0 && (
+                  <hr className="border-default-border/20 mb-3" />
+                )}
+                {/* Question line */}
+                <div className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm">
+                  <span className="font-mono text-xs">
+                    <span className="text-accent mr-2">&gt;</span>
+                    <span className="text-white">{entry.question}</span>
+                  </span>
+                </div>
+                {/* Answer block */}
+                <div className="border-l border-default-border/30 px-3 py-2">
+                  <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
+                  <span className="text-gray-300 text-xs leading-relaxed">{entry.answer}</span>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {/* Typing indicator */}
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm"
+            >
+              <span className="font-mono text-xs text-accent">
+                &gt; <span className="animate-pulse">▍</span>
+              </span>
+            </motion.div>
+          )}
+
+          <div ref={transcriptEndRef} />
+        </motion.div>
+
+        {/* Zone 3 — Question Dock */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.55 }}
+          className="shrink-0 border-t border-default-border/40 px-4 sm:px-6 pt-3 pb-3 sm:pb-4 flex flex-col gap-2.5"
+        >
+          <p className="text-[10px] text-text-secondary tracking-widest text-center font-mono select-none">
+            ── selecione ──
+          </p>
+
+          <div className="flex flex-wrap gap-2 justify-center min-h-8">
+            <AnimatePresence mode="popLayout">
+              {availableQuestions.map((q, i) => (
+                <QuestionPill
+                  key={`${pillKey}-${q.id}`}
+                  question={q}
+                  index={i}
+                  onSelect={() => handleSelect(q)}
+                  disabled={isTyping}
+                />
               ))}
             </AnimatePresence>
 
-            {isLoadingResponse && (
-              <motion.div
+            {availableQuestions.length === 0 && !isTyping && (
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex justify-start"
+                className="text-[10px] font-mono text-text-secondary italic"
               >
-                <div className="px-3 py-2 rounded-sm border border-accent/30 bg-accent/10">
-                  <TypingAnimation />
-                </div>
-              </motion.div>
+                // todas as perguntas respondidas
+              </motion.p>
             )}
-            <div ref={messagesEndRef} />
-          </motion.div>
+          </div>
 
-          {/* Questions Container */}
-          <AnimatePresence>
-            {availableQuestions.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-default-border/50 pt-2"
-              >
-                {availableQuestions.slice(0, 4).map((question, idx) => (
-                  <motion.button
-                    key={question.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    onClick={() => handleSelectQuestion(question)}
-                    disabled={isLoadingResponse}
-                    className="group relative text-left p-2.5 text-xs sm:text-xs border border-default-border bg-background rounded-sm transition-all duration-300 hover:border-accent/50 hover:bg-accent/5 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <p className="font-semibold text-gray-200 group-hover:text-accent transition-colors line-clamp-2">
-                      {question.question}
-                    </p>
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-text-secondary font-mono">
+              {answeredCount}/{chatData.questions.length} respondidas
+            </span>
+            <button
+              onClick={handleReset}
+              className="text-[10px] font-mono text-accent/50 hover:text-accent transition-colors cursor-pointer"
+            >
+              ↺ reiniciar
+            </button>
+          </div>
+        </motion.div>
 
-            {availableQuestions.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-4 gap-3"
-              >
-                <p className="text-xs sm:text-sm text-gray-400 italic text-center">
-                  Você explorou todas as minhas áreas! 🚀
-                </p>
-                <motion.button
-                  onClick={handleResetChat}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-2 px-4 py-2 text-xs font-medium bg-accent/10 text-accent border border-accent/30 rounded-sm hover:bg-accent/20 transition-colors"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Reiniciar conversa
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
     </ContentLayout>
   );

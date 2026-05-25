@@ -42,7 +42,7 @@
   --color-accent-third: #10171b;
   --color-text-secondary: #99a4ac;
 
-  --color-default-border: #1a1a1a;
+  --color-default-border: #222629;
   --color-secondary: #6c757d;
   --color-success: #28a745;
   --color-danger: #dc3545;
@@ -58,17 +58,98 @@
   --color-default-border: #dee2e6;
 }
 
+/* ─── Deep Space Background ─────────────────────────────────────────────────── */
+
 body {
   font-family: var(--font-inter);
   overflow-x: hidden;
+  background-color: #050607;
+
+  background-image:
+    /* Vignette: afunda as bordas para o conteúdo flutuar */
+    radial-gradient(
+      ellipse 120% 120% at 50% 50%,
+      transparent 35%,
+      rgba(2, 3, 4, 0.75) 100%
+    ),
+    /* Nebulosa cyan: canto superior esquerdo, quase imperceptível */
+    radial-gradient(
+      ellipse 70% 55% at 8% 12%,
+      rgba(64, 203, 246, 0.038) 0%,
+      transparent 100%
+    ),
+    /* Nebulosa petróleo: canto inferior direito, profundidade fria */
+    radial-gradient(
+      ellipse 65% 60% at 92% 88%,
+      rgba(13, 34, 51, 0.55) 0%,
+      transparent 100%
+    ),
+    /* Núcleo: centro levemente mais quente que as bordas */
+    radial-gradient(
+      ellipse 80% 70% at 50% 48%,
+      #0a0f14 0%,
+      #050607 100%
+    ),
+    /* Estrelas grandes (~2px) — esparsas */
+    radial-gradient(circle 1px at 12% 18%, rgba(255,255,255,0.18) 0%, transparent 100%),
+    radial-gradient(circle 1px at 87% 9%,  rgba(255,255,255,0.14) 0%, transparent 100%),
+    radial-gradient(circle 1px at 34% 72%, rgba(255,255,255,0.16) 0%, transparent 100%),
+    radial-gradient(circle 1px at 91% 61%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(circle 1px at 55% 88%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(circle 1px at 7%  54%, rgba(255,255,255,0.10) 0%, transparent 100%),
+    radial-gradient(circle 1px at 73% 33%, rgba(255,255,255,0.13) 0%, transparent 100%),
+    /* Estrelas médias (~1.5px) — distribuição irregular */
+    radial-gradient(circle 0.75px at 22% 41%, rgba(255,255,255,0.12) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 48% 14%, rgba(255,255,255,0.10) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 66% 79%, rgba(255,255,255,0.09) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 3%  82%, rgba(255,255,255,0.11) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 81% 47%, rgba(255,255,255,0.08) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 39% 95%, rgba(255,255,255,0.10) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 95% 28%, rgba(255,255,255,0.09) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 17% 63%, rgba(255,255,255,0.07) 0%, transparent 100%),
+    radial-gradient(circle 0.75px at 58% 52%, rgba(255,255,255,0.06) 0%, transparent 100%),
+    /* Estrelas pequenas (~1px) — campo denso, opacidades baixas */
+    radial-gradient(circle 0.5px at 29% 7%,  rgba(255,255,255,0.08) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 77% 22%, rgba(255,255,255,0.07) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 44% 38%, rgba(255,255,255,0.06) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 11% 91%, rgba(255,255,255,0.08) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 62% 67%, rgba(255,255,255,0.05) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 88% 74%, rgba(255,255,255,0.07) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 33% 56%, rgba(255,255,255,0.05) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 51% 29%, rgba(255,255,255,0.06) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 5%  35%, rgba(255,255,255,0.05) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 97% 51%, rgba(255,255,255,0.06) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 70% 96%, rgba(255,255,255,0.05) 0%, transparent 100%),
+    radial-gradient(circle 0.5px at 25% 83%, rgba(255,255,255,0.04) 0%, transparent 100%);
+
+  background-size: 100% 100%;
+  background-attachment: fixed;
 }
 
-/* Também desabilitar scroll horizontal no html */
+/* Grain orgânico — impede o visual de parecer gerado por software */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 512px 512px;
+}
+
+/* Conteúdo sempre acima das camadas decorativas */
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
+
 html {
   overflow-x: hidden;
 }
 
-/* Scrollbar styling - apenas vertical */
 ::-webkit-scrollbar {
   width: 10px;
 }
