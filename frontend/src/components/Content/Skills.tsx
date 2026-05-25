@@ -247,11 +247,13 @@ const MobileCategoryCard = ({
   skills,
   isExpanded,
   onToggle,
+  resolveColor,
 }: {
   category: Exclude<CategorySkill, "All">;
   skills: Skill[];
   isExpanded: boolean;
   onToggle: () => void;
+  resolveColor: (skill: Skill) => string;
 }) => {
   const config = categoryConfig[category];
   const Icon = config.icon;
@@ -261,26 +263,42 @@ const MobileCategoryCard = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border border-default-border rounded-sm overflow-hidden bg-card-background/30"
+      className="border border-default-border/60 rounded-sm overflow-hidden"
+      style={{ backgroundColor: "var(--color-background)" }}
     >
       <button
         onClick={onToggle}
-        className={`w-full flex items-center justify-between p-3 ${config.color} border-b border-default-border/50`}
+        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer"
+        style={{ borderBottom: isExpanded ? "1px solid var(--color-default-border)" : "1px solid transparent" }}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 border border-current/30 bg-background/50 flex items-center justify-center rounded-sm">
-            <Icon className="w-5 h-5" />
+          <div
+            className="w-8 h-8 flex items-center justify-center rounded-sm shrink-0"
+            style={{ backgroundColor: "var(--color-accent-third)", border: "1px solid var(--color-default-border)" }}
+          >
+            <Icon className="w-4 h-4" style={{ color: "var(--color-accent)" } as React.CSSProperties} />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-semibold">{category}</h3>
-            <p className="text-[10px] opacity-80 mt-0.5">{skills.length} tecnologias</p>
+            <p className="text-xs font-semibold text-text-primary">{category}</p>
+            <p className="font-mono text-[10px] text-text-muted mt-0.5">{skills.length} tecnologias</p>
           </div>
         </div>
-        <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronRight className="w-5 h-5" />
-        </motion.div>
+        <div className="flex items-center gap-3">
+          {/* Featured icons preview */}
+          {!isExpanded && (
+            <div className="flex items-center gap-1">
+              {featured.slice(0, 3).map((s) => {
+                const SI = s.icon;
+                return <SI key={s.name} size={13} style={{ color: resolveColor(s) }} />;
+              })}
+            </div>
+          )}
+          <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: 0.2 }}>
+            <ChevronRight className="w-4 h-4 text-text-muted" />
+          </motion.div>
+        </div>
       </button>
 
       <AnimatePresence>
@@ -292,29 +310,50 @@ const MobileCategoryCard = ({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="p-3 bg-background/50">
-              <div className="flex flex-wrap gap-2 mb-3">
-                {sorted.map((skill) => {
-                  const SkillIcon = skill.icon;
-                  return (
-                    <div
-                      key={skill.name}
-                      className={`flex items-center gap-1.5 bg-background border border-default-border/50 rounded-sm ${
-                        skill.featured ? "px-3 py-2" : "px-2 py-1.5"
-                      }`}
-                    >
-                      <SkillIcon
-                        size={skill.featured ? 18 : 14}
-                        style={{ color: skill.iconColor }}
-                      />
-                      <span className={skill.featured ? "text-xs text-text-code" : "text-[10px] text-text-muted"}>
-                        {skill.name}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-[10px] text-text-secondary leading-relaxed">{config.description}</p>
+            <div className="px-4 pt-3 pb-4">
+              {/* Featured */}
+              {featured.length > 0 && (
+                <div className="mb-3">
+                  <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-2">destaque</p>
+                  <div className="flex flex-wrap gap-2">
+                    {featured.map((skill) => {
+                      const SkillIcon = skill.icon;
+                      return (
+                        <div
+                          key={skill.name}
+                          className="flex items-center gap-2 px-3 py-2 rounded-sm border border-default-border/50"
+                          style={{ backgroundColor: "var(--color-card-background)" }}
+                        >
+                          <SkillIcon size={16} style={{ color: resolveColor(skill) }} />
+                          <span className="text-xs text-text-code font-medium">{skill.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {/* Secondary */}
+              {secondary.length > 0 && (
+                <div className="mb-3">
+                  <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-2">demais</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {secondary.map((skill) => {
+                      const SkillIcon = skill.icon;
+                      return (
+                        <div
+                          key={skill.name}
+                          className="flex items-center gap-1.5 px-2 py-1.5 rounded-sm border border-default-border/40"
+                          style={{ backgroundColor: "var(--color-card-background)" }}
+                        >
+                          <SkillIcon size={12} style={{ color: resolveColor(skill) }} />
+                          <span className="text-[10px] text-text-muted">{skill.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              <p className="font-mono text-[10px] text-text-secondary leading-relaxed">{config.description}</p>
             </div>
           </motion.div>
         )}
@@ -355,11 +394,20 @@ const Skills = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg">
 
         {/* Mobile View */}
         <div className="md:hidden flex flex-col h-full overflow-hidden">
-          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 pb-20 scrollbar-hide">
+          {/* Mobile header slim */}
+          <div className="shrink-0 px-4 py-3 border-b border-default-border/40">
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs text-accent">Skills</span>
+              <span className="font-mono text-[10px] text-text-secondary">
+                <span className="text-accent font-bold">{skillList.length}</span> tecnologias
+              </span>
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 pb-24 scrollbar-hide">
             {(Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]).map((category) => (
               <MobileCategoryCard
                 key={category}
@@ -367,6 +415,7 @@ const Skills = () => {
                 skills={skillsByCategory[category]}
                 isExpanded={expandedMobileCategory === category}
                 onToggle={() => toggleMobileCategory(category)}
+                resolveColor={ic}
               />
             ))}
           </div>

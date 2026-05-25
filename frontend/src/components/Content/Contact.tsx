@@ -58,7 +58,7 @@ const Contact = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background pb-20 md:pb-0">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg pb-20 md:pb-0">
 
         {/* Header slim */}
         <motion.div

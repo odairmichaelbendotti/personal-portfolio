@@ -247,48 +247,82 @@ const ProjectDetail = ({ project }: { project: Project }) => (
   </motion.div>
 );
 
-const MobileCard = ({ project }: { project: Project }) => (
+const MobileCard = ({ project, index }: { project: Project; index: number }) => (
   <motion.div
-    initial={{ opacity: 0, y: 8 }}
+    initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="border border-default-border/60 rounded-sm mb-3 bg-background overflow-hidden"
+    transition={{ duration: 0.2, delay: index * 0.05 }}
+    className="rounded-sm overflow-hidden"
+    style={{ border: "1px solid var(--color-default-border)", backgroundColor: "var(--color-background)" }}
   >
     {project.image && (
-      <div className="w-full h-28 overflow-hidden">
+      <div className="relative w-full h-32 overflow-hidden">
         <img
           src={project.image}
           alt={project.title}
-          className="w-full h-full object-cover opacity-70"
+          className="w-full h-full object-cover"
+          style={{ opacity: 0.75 }}
         />
+        {/* Gradient overlay bottom */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to bottom, transparent 40%, var(--color-background) 100%)" }}
+        />
+        {/* Featured badge */}
+        {project.featured && (
+          <div
+            className="absolute top-2 right-2 font-mono text-[9px] px-2 py-0.5 rounded-sm"
+            style={{ backgroundColor: "var(--color-accent-third)", color: "var(--color-accent)", border: "1px solid var(--color-default-border)" }}
+          >
+            ★ destaque
+          </div>
+        )}
+        {/* num */}
+        <span
+          className="absolute bottom-2 left-3 font-mono text-[10px]"
+          style={{ color: project.color }}
+        >
+          {project.num}
+        </span>
       </div>
     )}
-    <div className="p-3">
-    <div className="h-0.5 w-8 mb-2 rounded-full" style={{ backgroundColor: project.color }} />
-    <div className="flex items-center gap-2 mb-1">
-      <span className="font-mono text-[10px] text-text-muted">{project.num}</span>
-      <span
-        className="text-[8px]"
-        style={{ color: project.color, visibility: project.featured ? "visible" : "hidden" }}
-      >
-        ●
-      </span>
-      <span className="text-xs font-medium text-text-secondary">{project.title}</span>
-    </div>
-    <div className="flex items-center gap-2 mb-2">
-      <span className={`font-mono text-[9px] px-1.5 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
-        {project.category}
-      </span>
-      <span className="font-mono text-[9px] text-text-muted">{project.year}</span>
-    </div>
-    <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-2">{project.description}</p>
-    <div className="flex items-center gap-1.5 flex-wrap">
-      {project.tech.slice(0, 4).map((t) => {
-        const entry = techIconMap[t];
-        if (!entry) return null;
-        const Icon = entry.icon;
-        return <Icon key={t} size={12} style={{ color: entry.color }} />;
-      })}
-    </div>
+
+    <div className="px-3 pt-2 pb-3">
+      {/* Color bar */}
+      <div className="h-0.5 w-8 mb-2 rounded-full" style={{ backgroundColor: project.color }} />
+
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <p className="text-sm font-semibold text-text-primary leading-tight">{project.title}</p>
+        <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+          {project.github && (
+            <a href={project.github} target="_blank" rel="noopener noreferrer">
+              <ExternalLink size={12} style={{ color: "var(--color-text-muted)" }} />
+            </a>
+          )}
+          {project.demo && (
+            <a href={project.demo} target="_blank" rel="noopener noreferrer">
+              <ExternalLink size={12} style={{ color: "var(--color-accent)" }} />
+            </a>
+          )}
+        </div>
+      </div>
+
+      <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-3">{project.description}</p>
+
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          {project.tech.slice(0, 4).map((t) => {
+            const entry = techIconMap[t];
+            if (!entry) return null;
+            const Icon = entry.icon;
+            return <Icon key={t} size={13} style={{ color: entry.color }} />;
+          })}
+          {project.tech.length > 4 && (
+            <span className="font-mono text-[9px] text-text-muted">+{project.tech.length - 4}</span>
+          )}
+        </div>
+        <span className="font-mono text-[9px] text-text-muted">{project.year}</span>
+      </div>
     </div>
   </motion.div>
 );
@@ -310,7 +344,7 @@ const Projects = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg">
 
         {/* Header */}
         <motion.div
@@ -432,12 +466,36 @@ const Projects = () => {
           </div>
 
           {/* Mobile list */}
-          <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide px-4 py-3 pb-24">
-            <AnimatePresence>
-              {filteredProjects.map((project) => (
-                <MobileCard key={project.id} project={project} />
-              ))}
-            </AnimatePresence>
+          <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide pb-24">
+            {/* Mobile category filters */}
+            <div className="flex overflow-x-auto scrollbar-hide gap-2 px-4 py-3 border-b border-default-border/30">
+              {categories.map((cat) => {
+                const Icon = tabIcons[cat];
+                const isActive = activeCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[10px] shrink-0 cursor-pointer transition-colors duration-150"
+                    style={{
+                      backgroundColor: isActive ? "var(--color-accent)" : "var(--color-background)",
+                      color: isActive ? "var(--color-card-background)" : "var(--color-text-secondary)",
+                      border: isActive ? "1px solid var(--color-accent)" : "1px solid var(--color-default-border)",
+                    }}
+                  >
+                    <Icon size={11} />
+                    <span>{cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="px-4 pt-3 flex flex-col gap-3">
+              <AnimatePresence>
+                {filteredProjects.map((project, i) => (
+                  <MobileCard key={project.id} project={project} index={i} />
+                ))}
+              </AnimatePresence>
+            </div>
           </div>
 
         </div>

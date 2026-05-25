@@ -36,12 +36,13 @@
 
 @theme {
   --color-background:      #090a0b;
-  --color-card-background: #1a1a1a;
+  --color-card-background: #111518;
+  --color-content-bg:      #090a0b;
   --color-accent:          #40cbf6;
   --color-accent-secondary:#246277;
-  --color-accent-third:    #10171b;
+  --color-accent-third:    #0d161b;
   --color-text-secondary:  #99a4ac;
-  --color-default-border:  #222629;
+  --color-default-border:  #1c2428;
 
   --color-text-primary:    #ffffff;
   --color-text-code:       #d1d5db;
@@ -57,6 +58,7 @@
 @variant light {
   --color-background:      #e8e0d4;
   --color-card-background: #f2ede6;
+  --color-content-bg:      #f2ede6;
   --color-accent:          #7c5c2e;
   --color-accent-secondary:#5a3e18;
   --color-accent-third:    #ddd5c8;

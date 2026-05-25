@@ -166,7 +166,7 @@ const Experience = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg">
 
         {/* Header slim */}
         <motion.div
@@ -192,8 +192,44 @@ const Experience = () => {
           <div className="mt-3 h-px bg-linear-to-r from-accent/30 via-default-border to-transparent" />
         </motion.div>
 
-        {/* Body: nav + content */}
-        <div className="flex flex-1 min-h-0">
+        {/* Mobile: tabs horizontais */}
+        <div className="md:hidden shrink-0 flex overflow-x-auto scrollbar-hide border-b border-default-border/40 px-4 gap-1">
+          {navItems.map((item) => {
+            const isActive = activeGroup === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveGroup(item.id)}
+                className="relative flex items-center gap-1.5 px-3 py-2.5 text-xs cursor-pointer shrink-0 border-b-2 transition-colors duration-150"
+                style={{
+                  borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
+                  color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
+                }}
+              >
+                <span>{item.label}</span>
+                <span className="font-mono text-[10px] opacity-50">{item.count}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Mobile: achievement area full width */}
+        <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide p-4 pb-24">
+          <motion.div
+            key={activeGroup + "-mobile"}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.18 }}
+            className="flex flex-col gap-3"
+          >
+            {visibleAchievements.map((achievement, i) => (
+              <AchievementCard key={achievement.id} achievement={achievement} index={i} />
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Body: nav + content — desktop only */}
+        <div className="hidden md:flex flex-1 min-h-0">
 
           {/* Nav lateral */}
           <motion.div
