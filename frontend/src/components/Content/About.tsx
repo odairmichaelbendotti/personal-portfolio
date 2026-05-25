@@ -142,9 +142,9 @@ const About = () => {
         {/* Zone 1 — Identity Block */}
         <div className="shrink-0 px-4 sm:px-6 pt-5 sm:pt-6 pb-4">
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <h1 className="leading-tight">
               <span className="text-3xl sm:text-4xl font-black tracking-tight text-accent">Odair</span>
@@ -153,18 +153,18 @@ const About = () => {
           </motion.div>
 
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.15 }}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.08, ease: [0.25, 0.1, 0.25, 1] }}
             className="mt-1.5 text-[10px] sm:text-xs text-text-secondary uppercase tracking-widest font-medium"
           >
             Full-stack Software Engineer
           </motion.p>
 
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.28 }}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.16, ease: [0.25, 0.1, 0.25, 1] }}
             className="mt-3 text-xs text-gray-400 leading-relaxed"
           >
             <span className="text-accent font-mono font-semibold">6+</span>
@@ -180,7 +180,7 @@ const About = () => {
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.6, delay: 0.38, ease: "easeOut" }}
+            transition={{ duration: 0.7, delay: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
             style={{ originX: 0 }}
             className="mt-4 h-px bg-linear-to-r from-accent/40 via-default-border to-transparent"
           />
@@ -190,7 +190,7 @@ const About = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
+          transition={{ duration: 0.55, delay: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex-1 overflow-y-auto scrollbar-hide px-4 sm:px-6 py-3 flex flex-col gap-3"
         >
           {transcript.length === 0 && !isTyping && (
@@ -249,9 +249,9 @@ const About = () => {
 
         {/* Zone 3 — Question Dock */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.55 }}
+          transition={{ duration: 0.55, delay: 0.34, ease: [0.25, 0.1, 0.25, 1] }}
           className="shrink-0 border-t border-default-border/40 px-4 sm:px-6 pt-3 pb-3 sm:pb-4 flex flex-col gap-2.5"
         >
           <p className="text-[10px] text-text-secondary tracking-widest text-center font-mono select-none">
