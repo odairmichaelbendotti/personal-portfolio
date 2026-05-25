@@ -1,23 +1,17 @@
-import { useState, useMemo } from "react";
-import ContentLayout from "./Layout/ContentLayout";
-import { motion, AnimatePresence } from "framer-motion"; // Corrigido importação do motion
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { ExternalLink, Layers, Code2, Sparkles, Cpu } from "lucide-react";
 import {
-  ExternalLink,
-  Folder,
-  Code2,
-  Layers,
-  Cpu,
-  Sparkles,
-} from "lucide-react";
+  SiNextdotjs, SiReact, SiTypescript, SiTailwindcss, SiVite,
+  SiNodedotjs, SiExpress, SiFastify, SiPrisma,
+  SiMongodb, SiPostgresql, SiRedis,
+  SiDocker, SiKubernetes, SiSocketdotio, SiGraphql,
+} from "react-icons/si";
+import { FaAws } from "react-icons/fa";
+import ContentLayout from "./Layout/ContentLayout";
 
-// GitHub Icon Component (SVG inline)
 const GitHubIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
   </svg>
 );
@@ -26,6 +20,7 @@ type ProjectCategory = "All" | "Full Stack" | "Frontend" | "Backend";
 
 interface Project {
   id: number;
+  num: string;
   title: string;
   description: string;
   longDescription: string;
@@ -33,871 +28,421 @@ interface Project {
   tech: string[];
   github?: string;
   demo?: string;
-  color: string;
-  gradient: string;
+  image?: string;
   featured: boolean;
   year: string;
+  color: string;
 }
 
 const projects: Project[] = [
   {
-    id: 1,
+    id: 1, num: "01",
     title: "E-Commerce Platform",
     description: "Plataforma completa de e-commerce com painel admin",
-    longDescription:
-      "Sistema completo de e-commerce com catálogo de produtos, carrinho de compras, checkout integrado com Stripe, painel administrativo para gestão de pedidos e produtos, notificações em tempo real via WebSocket.",
+    longDescription: "Sistema completo de e-commerce com catálogo de produtos, carrinho de compras, checkout integrado com Stripe, painel administrativo para gestão de pedidos e produtos, notificações em tempo real via WebSocket.",
     category: "Full Stack",
     tech: ["Next.js", "Node.js", "PostgreSQL", "Redis"],
-    github: "https://github.com",
-    demo: "https://demo.com",
-    color: "from-slate-600/20 to-slate-800/20",
-    gradient: "from-slate-500 to-slate-700",
+    github: "https://github.com/obendotti/ecommerce-platform",
+    demo: "https://ecommerce.obendotti.dev",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
     featured: true,
     year: "2024",
+    color: "#40cbf6",
   },
   {
-    id: 2,
+    id: 2, num: "02",
     title: "API Gateway",
     description: "Gateway de APIs com rate limiting e cache",
-    longDescription:
-      "Sistema de gateway para gerenciamento de microsserviços com rate limiting, cache distribuído, autenticação OAuth2, logging centralizado, health checks e balanceamento de carga.",
+    longDescription: "Sistema de gateway para gerenciamento de microsserviços com rate limiting, cache distribuído, autenticação OAuth2, logging centralizado, health checks e balanceamento de carga.",
     category: "Backend",
     tech: ["Node.js", "Fastify", "Redis", "Docker"],
-    github: "https://github.com",
-    color: "from-zinc-600/20 to-zinc-800/20",
-    gradient: "from-zinc-500 to-zinc-700",
+    github: "https://github.com/obendotti/api-gateway",
+    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
     featured: false,
     year: "2024",
+    color: "#a78bfa",
   },
   {
-    id: 3,
+    id: 3, num: "03",
     title: "Task Management",
     description: "Gerenciamento de tarefas com colaboração em tempo real",
-    longDescription:
-      "Aplicação de gerenciamento de projetos estilo Trello com drag-and-drop, colaboração em tempo real usando WebSocket, comentários, anexos, notificações e relatórios de produtividade.",
+    longDescription: "Aplicação de gerenciamento de projetos estilo Trello com drag-and-drop, colaboração em tempo real usando WebSocket, comentários, anexos, notificações e relatórios de produtividade.",
     category: "Full Stack",
     tech: ["React", "Express", "MongoDB", "Socket.io"],
-    github: "https://github.com",
-    demo: "https://demo.com",
-    color: "from-gray-600/20 to-gray-800/20",
-    gradient: "from-gray-500 to-gray-700",
+    github: "https://github.com/obendotti/task-management",
+    demo: "https://tasks.obendotti.dev",
+    image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&q=80",
     featured: true,
     year: "2024",
+    color: "#34d399",
   },
   {
-    id: 4,
+    id: 4, num: "04",
     title: "Data Dashboard",
     description: "Dashboard analítico com visualização de dados complexos",
-    longDescription:
-      "Dashboard interativo para visualização de métricas de negócio com gráficos dinâmicos, filtros avançados, exportação de relatórios, integração com APIs externas e autenticação JWT.",
+    longDescription: "Dashboard interativo para visualização de métricas de negócio com gráficos dinâmicos, filtros avançados, exportação de relatórios, integração com APIs externas e autenticação JWT.",
     category: "Frontend",
     tech: ["React", "TypeScript", "Tailwind", "Vite"],
-    github: "https://github.com",
-    demo: "https://demo.com",
-    color: "from-slate-700/20 to-slate-900/20",
-    gradient: "from-slate-600 to-slate-800",
+    github: "https://github.com/obendotti/data-dashboard",
+    demo: "https://dashboard.obendotti.dev",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
     featured: false,
     year: "2023",
+    color: "#f59e0b",
   },
   {
-    id: 5,
+    id: 5, num: "05",
     title: "Social Network",
     description: "Rede social com feed em tempo real e stories",
-    longDescription:
-      "Aplicação de rede social completa com feed de posts, sistema de stories, chat em tempo real, notificações push, algoritmo de feed personalizado e sistema de seguidores.",
+    longDescription: "Aplicação de rede social completa com feed de posts, sistema de stories, chat em tempo real, notificações push, algoritmo de feed personalizado e sistema de seguidores.",
     category: "Full Stack",
     tech: ["Next.js", "Prisma", "PostgreSQL", "WebSocket"],
-    github: "https://github.com",
-    demo: "https://demo.com",
-    color: "from-stone-600/20 to-stone-800/20",
-    gradient: "from-stone-500 to-stone-700",
+    github: "https://github.com/obendotti/social-network",
+    demo: "https://social.obendotti.dev",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80",
     featured: true,
     year: "2024",
+    color: "#f472b6",
   },
   {
-    id: 6,
+    id: 6, num: "06",
     title: "Mobile Banking",
     description: "App bancário com biometria e PIX",
-    longDescription:
-      "Aplicativo mobile de serviços bancários com autenticação biométrica, integração PIX, extrato em tempo real, transferências, pagamento de boletos e cartão virtual.",
+    longDescription: "Aplicativo mobile de serviços bancários com autenticação biométrica, integração PIX, extrato em tempo real, transferências, pagamento de boletos e cartão virtual.",
     category: "Frontend",
     tech: ["React Native", "Node.js", "PostgreSQL", "AWS"],
-    github: "https://github.com",
-    color: "from-neutral-600/20 to-neutral-800/20",
-    gradient: "from-neutral-500 to-neutral-700",
+    github: "https://github.com/obendotti/mobile-banking",
+    demo: "https://banking.obendotti.dev",
+    image: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=800&q=80",
     featured: false,
     year: "2023",
+    color: "#60a5fa",
   },
   {
-    id: 7,
+    id: 7, num: "07",
     title: "CMS Headless",
     description: "CMS com edição visual e multi-tenant",
-    longDescription:
-      "Sistema de gerenciamento de conteúdo headless com editor visual drag-and-drop, suporte multi-tenant, versionamento de conteúdo, webhooks e API GraphQL/REST.",
+    longDescription: "Sistema de gerenciamento de conteúdo headless com editor visual drag-and-drop, suporte multi-tenant, versionamento de conteúdo, webhooks e API GraphQL/REST.",
     category: "Full Stack",
     tech: ["Next.js", "PostgreSQL", "Redis", "Kubernetes"],
-    github: "https://github.com",
-    demo: "https://demo.com",
-    color: "from-slate-500/20 to-slate-700/20",
-    gradient: "from-slate-400 to-slate-600",
+    github: "https://github.com/obendotti/cms-headless",
+    demo: "https://cms.obendotti.dev",
+    image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80",
     featured: false,
     year: "2024",
+    color: "#fb923c",
   },
 ];
 
-const categories: ProjectCategory[] = [
-  "All",
-  "Full Stack",
-  "Frontend",
-  "Backend",
-];
+const techIconMap: Record<string, { icon: React.ElementType; color: string }> = {
+  "Next.js":      { icon: SiNextdotjs,    color: "#ffffff" },
+  "React":        { icon: SiReact,        color: "#61DAFB" },
+  "React Native": { icon: SiReact,        color: "#61DAFB" },
+  "TypeScript":   { icon: SiTypescript,   color: "#3178C6" },
+  "Tailwind":     { icon: SiTailwindcss,  color: "#06B6D4" },
+  "Vite":         { icon: SiVite,         color: "#646CFF" },
+  "Node.js":      { icon: SiNodedotjs,    color: "#339933" },
+  "Express":      { icon: SiExpress,      color: "#ffffff" },
+  "Fastify":      { icon: SiFastify,      color: "#ffffff" },
+  "Prisma":       { icon: SiPrisma,       color: "#2D3748" },
+  "MongoDB":      { icon: SiMongodb,      color: "#47A248" },
+  "PostgreSQL":   { icon: SiPostgresql,   color: "#4169E1" },
+  "Redis":        { icon: SiRedis,        color: "#FF4438" },
+  "Docker":       { icon: SiDocker,       color: "#2496ED" },
+  "AWS":          { icon: FaAws,          color: "#FF9900" },
+  "Kubernetes":   { icon: SiKubernetes,   color: "#326CE5" },
+  "Socket.io":    { icon: SiSocketdotio,  color: "#ffffff" },
+  "WebSocket":    { icon: SiSocketdotio,  color: "#ffffff" },
+  "GraphQL":      { icon: SiGraphql,      color: "#E10098" },
+};
 
-const categoryIcons = {
+const categories: ProjectCategory[] = ["All", "Full Stack", "Frontend", "Backend"];
+
+const tabIcons: Record<ProjectCategory, React.ElementType> = {
   All: Layers,
   "Full Stack": Code2,
   Frontend: Sparkles,
   Backend: Cpu,
 };
 
-// --- Inicia  o mapeamento de tecnologias para ícones ---
-const techIconMap: Record<string, string> = {
-  "Next.js": "./icons/frontend/nextjs.svg",
-  React: "./icons/frontend/react.svg",
-  "React Native": "./icons/frontend/react.svg",
-  TypeScript: "./icons/backend/typescript.svg",
-  Tailwind: "./icons/frontend/tailwindcss.svg",
-  Vite: "./icons/frontend/vite.svg",
-  "Node.js": "./icons/backend/nodejs.svg",
-  Express: "./icons/backend/express.svg",
-  Fastify: "./icons/backend/fastify.svg",
-  Prisma: "./icons/backend/prisma.svg",
-  MongoDB: "./icons/database/mongodb.svg",
-  PostgreSQL: "./icons/database/postgresql.svg",
-  Redis: "./icons/database/redis.svg",
-  Docker: "./icons/infrastructure/docker.svg",
-  AWS: "./icons/infrastructure/aws.svg",
-  Kubernetes: "./icons/infrastructure/kubernetes.svg",
-  "Socket.io": "./icons/backend/nodejs.svg",
-  WebSocket: "./icons/backend/nodejs.svg",
+const categoryChipColors: Record<string, string> = {
+  "Full Stack": "bg-accent/10 text-accent border-accent/20",
+  Frontend: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  Backend: "bg-blue-500/10 text-blue-400 border-blue-500/20",
 };
 
-const TechIcon = ({ tech }: { tech: string }) => {
-  const iconPath = techIconMap[tech];
-  if (!iconPath) return null;
-
-  return (
-    <div className="w-5 h-5 p-0.5 bg-background/80 border border-default-border/50 rounded-sm flex items-center justify-center hover:border-accent/30 transition-colors">
-      <img
-        src={iconPath}
-        alt={tech}
-        className="w-full h-full object-contain"
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = "none";
-        }}
-      />
-    </div>
-  );
-};
-// *** Termina o Mapeamento de tecnologias para ícones ***
-
-// --- Inicia o Card lateral para o segundo projeto ---
-const SideProjectCard = ({
-  project,
-  onSelect,
-}: {
-  project: Project;
-  onSelect: (p: Project) => void;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelect(project)}
-      className="group relative cursor-pointer overflow-hidden rounded-sm border border-default-border bg-card-background h-full"
-    >
-      {/* Background */}
-      <div
-        className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-40 transition-opacity duration-500 group-hover:opacity-70`}
-      />
-
-      {/* Corner accents */}
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute top-0 left-0 w-3 h-3 border-t border-l border-accent"
-      />
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-accent"
-      />
-
-      {/* Content */}
-      <div className="relative z-10 p-5 flex flex-col h-full justify-between">
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-gray-500">
-                {project.year}
-              </span>
-              <span className="px-2 py-0.5 text-[10px] bg-accent/10 text-accent border border-accent/30 rounded-sm">
-                {project.category}
-              </span>
-            </div>
-            <motion.div
-              animate={{ rotate: isHovered ? 45 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="text-accent/60"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </motion.div>
-          </div>
-
-          <h3 className="text-base font-semibold text-gray-200 mb-2 group-hover:text-accent transition-colors line-clamp-1">
-            {project.title}
-          </h3>
-
-          <p className="text-sm text-text-secondary line-clamp-3 mb-4">
-            {project.description}
-          </p>
-        </div>
-
-        {/* Tech icons - TODOS OS PROJETOS */}
-        <div className="flex items-center gap-2">
-          <p className="text-[10px] text-gray-500 uppercase">Tech:</p>
-          <div className="flex -space-x-1">
-            {project.tech.slice(0, 4).map((t, i) => (
-              <div key={t} className="relative" style={{ zIndex: 4 - i }}>
-                <TechIcon tech={t} />
-              </div>
-            ))}
-          </div>
-          {project.tech.length > 4 && (
-            <span className="text-[10px] text-gray-500 ml-1">
-              +{project.tech.length - 4}
-            </span>
-          )}
-        </div>
-
-        {/* Links */}
-        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-default-border/30">
-          {project.github && (
-            <motion.a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-accent transition-colors"
-            >
-              <GitHubIcon className="w-3.5 h-3.5" />
-              <span>Code</span>
-            </motion.a>
-          )}
-          {project.demo && (
-            <motion.a
-              href={project.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-accent transition-colors"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Demo</span>
-            </motion.a>
-          )}
-        </div>
+const ProjectDetail = ({ project }: { project: Project }) => (
+  <motion.div
+    key={project.id}
+    initial={{ opacity: 0, x: 8 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.2 }}
+    className="p-5"
+  >
+    {project.image && (
+      <div className="w-full h-36 mb-4 rounded-sm overflow-hidden border border-default-border/40">
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-full object-cover opacity-80"
+        />
       </div>
-    </motion.div>
-  );
-};
-// *** Termina o Card lateral para o segundo projeto ***
+    )}
 
-// --- Inicia o Card principal maior (primeiro projeto) ---
-const FeaturedProjectCard = ({
-  project,
-  onSelect,
-}: {
-  project: Project;
-  onSelect: (p: Project) => void;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
+    <div className="h-0.5 w-12 mb-4 rounded-full" style={{ backgroundColor: project.color }} />
 
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.4 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelect(project)}
-      className="group relative cursor-pointer overflow-hidden rounded-sm border border-default-border bg-card-background"
-    >
-      {/* Background gradient - sem hover branco */}
-      <div
-        className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-40`}
-      />
+    <h2 className="text-xl font-bold text-white mb-1">{project.title}</h2>
 
-      {/* Animated border glow removido - estava causando efeito branco */}
-
-      {/* Corner accents - igual aos outros cards */}
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute top-0 left-0 w-3 h-3 border-t border-l border-accent"
-      />
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute top-0 right-0 w-3 h-3 border-t border-r border-accent"
-      />
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-accent"
-      />
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-accent"
-      />
-
-      {/* Content */}
-      <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full min-h-60">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-gray-400">
-              {project.year}
-            </span>
-            <span className="px-2 py-0.5 text-[10px] bg-accent/20 text-accent border border-accent/50 rounded-sm">
-              ★ Featured
-            </span>
-          </div>
-          <motion.div
-            animate={{ rotate: isHovered ? 45 : 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-accent/60"
-          >
-            <ExternalLink className="w-4 h-4" />
-          </motion.div>
-        </div>
-
-        {/* Title */}
-        <h3 className="text-lg sm:text-xl font-bold text-gray-100 mb-2 group-hover:text-accent transition-colors duration-300">
-          {project.title}
-        </h3>
-
-        {/* Description */}
-        <p className="text-sm text-text-secondary mb-4 line-clamp-2 flex-1">
-          {project.description}
-        </p>
-
-        {/* Tech stack com ícones - TODOS OS PROJETOS */}
-        <div className="mb-4">
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
-            Technologies
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {project.tech.map((t) => (
-              <TechIcon key={t} tech={t} />
-            ))}
-          </div>
-        </div>
-
-        {/* Links */}
-        <div className="flex items-center gap-3 mt-auto pt-3 border-t border-default-border/50">
-          {project.github && (
-            <motion.a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-accent transition-colors"
-            >
-              <GitHubIcon className="w-3.5 h-3.5" />
-              <span>Code</span>
-            </motion.a>
-          )}
-          {project.demo && (
-            <motion.a
-              href={project.demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-accent transition-colors"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Demo</span>
-            </motion.a>
-          )}
-        </div>
-      </div>
-
-      {/* Hover overlay removido - estava causando efeito branco */}
-    </motion.div>
-  );
-};
-// *** Termina o Card principal maior (primeiro projeto) ***
-
-// --- Inicia o Card compacto para filtros de categoria ---
-const CompactProjectCard = ({
-  project,
-  index,
-  onSelect,
-}: {
-  project: Project;
-  index: number;
-  onSelect: (p: Project) => void;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelect(project)}
-      className="group relative cursor-pointer overflow-hidden rounded-sm border border-default-border bg-card-background"
-    >
-      {/* Background */}
-      <div
-        className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-30 transition-opacity duration-500 group-hover:opacity-60`}
-      />
-
-      {/* Corner accents */}
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.1 }}
-        className="absolute top-0 left-0 w-2 h-2 border-t border-l border-accent"
-      />
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.1 }}
-        className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-accent"
-      />
-
-      {/* Content */}
-      <div className="relative z-10 p-3 flex flex-col h-full min-h-30">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <span className="text-[10px] font-mono text-gray-500">
-            {project.year}
-          </span>
-          <motion.div
-            animate={{ rotate: isHovered ? 45 : 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-accent/40"
-          >
-            <ExternalLink className="w-3 h-3" />
-          </motion.div>
-        </div>
-
-        {/* Title */}
-        <h3 className="text-sm font-medium text-gray-200 mb-1 group-hover:text-accent transition-colors line-clamp-1">
-          {project.title}
-        </h3>
-
-        {/* Description */}
-        <p className="text-xs text-text-secondary line-clamp-2 flex-1 mb-2">
-          {project.description}
-        </p>
-
-        {/* Tech icons - TODOS OS CARDS COMPACTOS */}
-        <div className="flex items-center gap-1.5 mt-auto">
-          <div className="flex -space-x-1">
-            {project.tech.slice(0, 3).map((t, i) => (
-              <div key={t} className="relative" style={{ zIndex: 3 - i }}>
-                <TechIcon tech={t} />
-              </div>
-            ))}
-          </div>
-          {project.tech.length > 3 && (
-            <span className="text-[9px] text-gray-500 ml-1">
-              +{project.tech.length - 3}
-            </span>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-// *** Termina o Card compacto para filtros de categoria ***
-
-// --- Inicia o Card padrão para os demais projetos (All view) ---
-const ProjectCard = ({
-  project,
-  index,
-  onSelect,
-}: {
-  project: Project;
-  index: number;
-  onSelect: (p: Project) => void;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onSelect(project)}
-      className="group relative cursor-pointer overflow-hidden rounded-sm border border-default-border bg-card-background"
-    >
-      {/* Background */}
-      <div
-        className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-40 transition-opacity duration-500 group-hover:opacity-70`}
-      />
-
-      {/* Corner accents */}
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute top-0 left-0 w-3 h-3 border-t border-l border-accent"
-      />
-      <motion.div
-        animate={{ opacity: isHovered ? 1 : 0.2 }}
-        className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-accent"
-      />
-
-      {/* Content */}
-      <div className="relative z-10 p-4 flex flex-col h-full min-h-40">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono text-gray-500">
-              {project.year}
-            </span>
-            {project.featured && (
-              <span className="px-1 py-0.5 text-[9px] bg-accent/20 text-accent border border-accent/50 rounded-sm">
-                ★
-              </span>
-            )}
-          </div>
-          <motion.div
-            animate={{ rotate: isHovered ? 45 : 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-accent/60"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-          </motion.div>
-        </div>
-
-        {/* Title */}
-        <h3 className="text-base font-medium text-gray-200 mb-1 group-hover:text-accent transition-colors line-clamp-1">
-          {project.title}
-        </h3>
-
-        {/* Description */}
-        <p className="text-xs text-text-secondary line-clamp-2 flex-1">
-          {project.description}
-        </p>
-
-        {/* Tech icons - TODOS OS CARDS */}
-        <div className="flex items-center gap-1.5 mt-3 mb-2">
-          <div className="flex -space-x-1">
-            {project.tech.slice(0, 3).map((t, i) => (
-              <div key={t} className="relative" style={{ zIndex: 3 - i }}>
-                <TechIcon tech={t} />
-              </div>
-            ))}
-          </div>
-          {project.tech.length > 3 && (
-            <span className="text-[10px] text-gray-500 ml-1">
-              +{project.tech.length - 3}
-            </span>
-          )}
-        </div>
-
-        {/* Category */}
-        <div className="mt-auto pt-2">
-          <span className="text-[10px] text-gray-500">{project.category}</span>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const ProjectModal = ({
-  project,
-  onClose,
-}: {
-  project: Project | null;
-  onClose: () => void;
-}) => {
-  if (!project) return null;
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          onClick={(e) => e.stopPropagation()}
-          className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-card-background border border-default-border rounded-sm"
+    <div className="flex items-center flex-wrap gap-2 mb-4 text-xs">
+      <span className={`font-mono text-[9px] px-2 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
+        {project.category}
+      </span>
+      <span className="font-mono text-[10px] text-text-secondary">{project.year}</span>
+      <span className="text-text-secondary">·</span>
+      {project.github && (
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-text-secondary hover:text-accent transition-colors"
         >
-          {/* Header gradient */}
+          <GitHubIcon className="w-3.5 h-3.5" />
+          <span>Code</span>
+        </a>
+      )}
+      {project.demo && (
+        <a
+          href={project.demo}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-text-secondary hover:text-accent transition-colors"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+          <span>Demo</span>
+        </a>
+      )}
+    </div>
+
+    <div className="h-px bg-default-border/30 mb-4" />
+
+    <p className="text-xs text-gray-400 leading-relaxed mb-5">{project.longDescription}</p>
+
+    <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-2">stack</p>
+    <div className="flex flex-wrap gap-2">
+      {project.tech.map((t) => {
+        const entry = techIconMap[t];
+        if (!entry) return null;
+        const Icon = entry.icon;
+        return (
           <div
-            className={`h-24 sm:h-32 bg-linear-to-r ${project.gradient} relative`}
+            key={t}
+            className="flex items-center gap-1.5 px-2 py-1.5 border border-default-border/50 bg-background/50 rounded-sm hover:border-accent/30 transition-colors group"
           >
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-black/50 text-white rounded-sm hover:bg-black/70 transition-colors"
-            >
-              ✕
-            </button>
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-card-background to-transparent" />
+            <Icon size={13} style={{ color: entry.color }} />
+            <span className="font-mono text-[10px] text-gray-400 group-hover:text-gray-200 transition-colors">{t}</span>
           </div>
+        );
+      })}
+    </div>
+  </motion.div>
+);
 
-          {/* Content */}
-          <div className="p-5 sm:p-6 -mt-8 relative">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">
-                  {project.title}
-                </h2>
-                <p className="text-sm text-gray-400">
-                  {project.category} • {project.year}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {project.github && (
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 text-sm bg-accent/10 text-accent border border-accent/30 rounded-sm hover:bg-accent/20 transition-colors"
-                  >
-                    <GitHubIcon className="w-4 h-4" />
-                    <span className="hidden sm:inline">Github</span>
-                  </a>
-                )}
-                {project.demo && (
-                  <a
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 text-sm bg-accent text-background font-medium rounded-sm hover:bg-accent/80 transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    <span className="hidden sm:inline">Demo</span>
-                  </a>
-                )}
-              </div>
-            </div>
-
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-6">
-              {project.longDescription}
-            </p>
-
-            <div>
-              <h4 className="text-sm font-semibold text-accent mb-3 uppercase tracking-wider">
-                Technologies
-              </h4>
-              <div className="flex flex-wrap gap-3">
-                {project.tech.map((t) => (
-                  <div
-                    key={t}
-                    className="flex items-center gap-2 px-3 py-2 bg-background border border-default-border rounded-sm"
-                  >
-                    <TechIcon tech={t} />
-                    <span className="text-sm text-gray-300">{t}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
+const MobileCard = ({ project }: { project: Project }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="border border-default-border/60 rounded-sm mb-3 bg-background overflow-hidden"
+  >
+    {project.image && (
+      <div className="w-full h-28 overflow-hidden">
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-full object-cover opacity-70"
+        />
+      </div>
+    )}
+    <div className="p-3">
+    <div className="h-0.5 w-8 mb-2 rounded-full" style={{ backgroundColor: project.color }} />
+    <div className="flex items-center gap-2 mb-1">
+      <span className="font-mono text-[10px] text-gray-600">{project.num}</span>
+      <span
+        className="text-[8px]"
+        style={{ color: project.color, visibility: project.featured ? "visible" : "hidden" }}
+      >
+        ●
+      </span>
+      <span className="text-xs font-medium text-text-secondary">{project.title}</span>
+    </div>
+    <div className="flex items-center gap-2 mb-2">
+      <span className={`font-mono text-[9px] px-1.5 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
+        {project.category}
+      </span>
+      <span className="font-mono text-[9px] text-gray-600">{project.year}</span>
+    </div>
+    <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{project.description}</p>
+    <div className="flex items-center gap-1.5 flex-wrap">
+      {project.tech.slice(0, 4).map((t) => {
+        const entry = techIconMap[t];
+        if (!entry) return null;
+        const Icon = entry.icon;
+        return <Icon key={t} size={12} style={{ color: entry.color }} />;
+      })}
+    </div>
+    </div>
+  </motion.div>
+);
 
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>("All");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedId, setSelectedId] = useState<number>(1);
 
-  const filteredProjects = useMemo(() => {
-    if (activeCategory === "All") {
-      return projects;
+  const filteredProjects =
+    activeCategory === "All" ? projects : projects.filter((p) => p.category === activeCategory);
+
+  useEffect(() => {
+    if (filteredProjects.length > 0) {
+      setSelectedId(filteredProjects[0].id);
     }
-    return projects.filter((p) => p.category === activeCategory);
   }, [activeCategory]);
 
-  // Separa o primeiro projeto e o segundo (para o card lateral)
-  const mainProject = filteredProjects[0];
-  const sideProject = filteredProjects[1];
-  const otherProjects = filteredProjects.slice(2);
-
-  // Verifica se está filtrado por categoria (não "All")
-  const isFiltered = activeCategory !== "All";
+  const selectedProject = projects.find((p) => p.id === selectedId) ?? projects[0];
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col bg-background overflow-hidden">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-background">
+
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 sm:p-5 border-b border-default-border bg-linear-to-r from-background via-background to-accent-third/5"
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="shrink-0 px-4 pt-3 pb-0"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 border border-accent/30 bg-accent/10 flex items-center justify-center rounded-sm">
-              <Folder className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs text-accent">Projetos</span>
+              <span className="text-text-secondary text-[10px]">·</span>
+              <span className="text-xs text-white/40">Odair Michael Bendotti</span>
             </div>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold text-accent">
-                Projects
-              </h1>
-              <p className="text-xs sm:text-sm text-text-secondary">
-                {filteredProjects.length} projects • {categories.length - 1}{" "}
-                categories
-              </p>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="font-mono font-bold text-accent text-xs">7</span>
+              <span className="text-[10px] text-text-secondary">projetos</span>
             </div>
           </div>
 
-          {/* Category filters */}
-          <div className="flex flex-wrap gap-2">
+          {/* Filter tabs */}
+          <div className="flex items-center border-b border-default-border/40">
             {categories.map((cat) => {
-              const Icon = categoryIcons[cat];
+              const Icon = tabIcons[cat];
               const isActive = activeCategory === cat;
+              const count = cat === "All" ? projects.length : projects.filter((p) => p.category === cat).length;
               return (
-                <motion.button
+                <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm rounded-sm border transition-all duration-300 ${
-                    isActive
-                      ? "bg-accent text-background border-accent font-medium"
-                      : "bg-background text-gray-400 border-default-border hover:border-accent/50 hover:text-accent"
-                  }`}
+                  className="px-4 py-2.5 text-xs cursor-pointer flex items-center gap-2 border-b-2 transition-colors duration-150"
+                  style={{
+                    borderBottomColor: isActive ? "#40cbf6" : "transparent",
+                    color: isActive ? "#40cbf6" : "#99a4ac",
+                  }}
+                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#ffffff"; }}
+                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#99a4ac"; }}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon size={13} />
                   <span>{cat}</span>
-                </motion.button>
+                  <span className="font-mono text-[10px] text-accent/50">{count}</span>
+                </button>
               );
             })}
           </div>
         </motion.div>
 
-        {/* Projects Grid */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 pb-20 sm:pb-5">
-          {filteredProjects.length > 0 ? (
-            <div className="flex flex-col gap-4">
-              {/* Row 1: Featured Project + Side Project (apenas na view All) */}
-              {!isFiltered && mainProject && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <div className="lg:col-span-2">
-                    <FeaturedProjectCard
-                      project={mainProject}
-                      onSelect={setSelectedProject}
-                    />
-                  </div>
-                  {sideProject && (
-                    <div className="lg:col-span-1">
-                      <SideProjectCard
-                        project={sideProject}
-                        onSelect={setSelectedProject}
-                      />
+        {/* Body — desktop split / mobile list */}
+        <div className="flex flex-1 min-h-0">
+
+          {/* Project list — desktop */}
+          <motion.div
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+            className="hidden md:flex shrink-0 w-52 border-r border-default-border/40 flex-col py-2 overflow-y-auto scrollbar-hide"
+          >
+            <AnimatePresence>
+              {filteredProjects.map((project, index) => {
+                const isActive = selectedId === project.id;
+                return (
+                  <motion.button
+                    key={project.id}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -6 }}
+                    transition={{ duration: 0.2, delay: index * 0.04 }}
+                    onClick={() => setSelectedId(project.id)}
+                    className="flex flex-col py-2 px-4 cursor-pointer border-l-2 transition-colors duration-150 -ml-px text-left"
+                    style={{
+                      borderLeftColor: isActive ? project.color : "transparent",
+                      backgroundColor: isActive ? project.color + "0d" : "transparent",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        const title = (e.currentTarget as HTMLElement).querySelector(".item-title") as HTMLElement;
+                        if (title) title.style.color = "#ffffff";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        const title = (e.currentTarget as HTMLElement).querySelector(".item-title") as HTMLElement;
+                        if (title) title.style.color = "#99a4ac";
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="font-mono text-[10px]"
+                        style={{ color: isActive ? project.color : "#4b5563" }}
+                      >
+                        {project.num}
+                      </span>
+                      <span
+                        className="text-[8px]"
+                        style={{ color: project.color, visibility: project.featured ? "visible" : "hidden" }}
+                      >
+                        ●
+                      </span>
+                      <span
+                        className="item-title text-xs font-medium transition-colors duration-150"
+                        style={{ color: isActive ? "#40cbf6" : "#99a4ac" }}
+                      >
+                        {project.title}
+                      </span>
                     </div>
-                  )}
-                </div>
-              )}
+                    <div className="font-mono text-[9px] text-gray-600 ml-8">
+                      {project.category} · {project.year}
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
+          </motion.div>
 
-              {/* Grid de projetos restantes (apenas quando não filtrado) */}
-              {!isFiltered && otherProjects.length > 0 && (
-                <motion.div
-                  layout
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                >
-                  <AnimatePresence mode="popLayout">
-                    {otherProjects.map((project, index) => (
-                      <ProjectCard
-                        key={project.id}
-                        project={project}
-                        index={index}
-                        onSelect={setSelectedProject}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              )}
+          {/* Project detail — desktop */}
+          <div className="hidden md:block flex-1 overflow-y-auto scrollbar-hide">
+            <ProjectDetail project={selectedProject} />
+          </div>
 
-              {/* Quando filtrado, mostra todos em grid compacto */}
-              {isFiltered && (
-                <motion.div
-                  layout
-                  className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
-                >
-                  <AnimatePresence mode="popLayout">
-                    {filteredProjects.map((project, index) => (
-                      <CompactProjectCard
-                        key={project.id}
-                        project={project}
-                        index={index}
-                        onSelect={setSelectedProject}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </motion.div>
-              )}
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center h-64 text-gray-500"
-            >
-              <Folder className="w-12 h-12 mb-3 opacity-50" />
-              <p>No projects found in this category</p>
-            </motion.div>
-          )}
+          {/* Mobile list */}
+          <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide px-4 py-3 pb-24">
+            <AnimatePresence>
+              {filteredProjects.map((project) => (
+                <MobileCard key={project.id} project={project} />
+              ))}
+            </AnimatePresence>
+          </div>
+
         </div>
 
-        {/* Stats footer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="px-4 sm:px-5 py-3 border-t border-default-border bg-linear-to-r from-accent-third/10 to-background pb-20 sm:pb-3"
-        >
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>
-              Showing {filteredProjects.length} of {projects.length} projects
-            </span>
-            <span className="hidden sm:inline">
-              {projects.filter((p) => p.featured).length} featured
-            </span>
-          </div>
-        </motion.div>
       </div>
-
-      {/* Modal */}
-      <ProjectModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-      />
     </ContentLayout>
   );
 };
