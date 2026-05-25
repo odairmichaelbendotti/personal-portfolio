@@ -58,7 +58,7 @@ const Contact = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-background pb-20 md:pb-0">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background pb-20 md:pb-0">
 
         {/* Header slim */}
         <motion.div
@@ -71,7 +71,7 @@ const Contact = () => {
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs text-accent">Contato</span>
               <span className="text-text-secondary text-[10px]">·</span>
-              <span className="text-xs text-white/40">Odair Michael Bendotti</span>
+              <span className="text-xs text-text-primary/40">Odair Michael Bendotti</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
@@ -97,18 +97,18 @@ const Contact = () => {
             <div className="flex items-baseline gap-0">
               <span className="w-12 shrink-0 font-mono text-[10px] text-accent/50">{localTime}</span>
               <span className="w-24 shrink-0 font-mono text-[10px] text-text-secondary/60">mailto://</span>
-              <span className="font-mono text-xs text-gray-200 truncate flex-1">{directContact.email}</span>
+              <span className="font-mono text-xs text-text-primary truncate flex-1">{directContact.email}</span>
             </div>
             <div className="mt-1.5 ml-36 flex items-center gap-2">
               <button
                 onClick={() => handleCopy(directContact.email, "email")}
                 className="flex items-center gap-1.5 font-mono text-[10px] px-2 py-0.5 border rounded-sm cursor-pointer transition-colors duration-150"
                 style={{
-                  borderColor: isCopied("email") ? "rgba(40,167,69,0.4)" : "rgba(34,38,41,0.8)",
-                  color: isCopied("email") ? "#28a745" : "#99a4ac",
+                  borderColor: isCopied("email") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
+                  color: isCopied("email") ? "var(--color-success)" : "var(--color-text-secondary)",
                 }}
-                onMouseEnter={(e) => { if (!isCopied("email")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)"; (e.currentTarget as HTMLElement).style.color = "#40cbf6"; } }}
-                onMouseLeave={(e) => { if (!isCopied("email")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(34,38,41,0.8)"; (e.currentTarget as HTMLElement).style.color = "#99a4ac"; } }}
+                onMouseEnter={(e) => { if (!isCopied("email")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)"; (e.currentTarget as HTMLElement).style.color = "var(--color-accent)"; } }}
+                onMouseLeave={(e) => { if (!isCopied("email")) { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-default-border)"; (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; } }}
               >
                 <AnimatePresence mode="wait">
                   {isCopied("email") ? (
@@ -144,18 +144,18 @@ const Contact = () => {
             <div className="flex items-baseline gap-0">
               <span className="w-12 shrink-0 font-mono text-[10px] text-accent/50">24/7</span>
               <span className="w-24 shrink-0 font-mono text-[10px] text-text-secondary/60">wa.me//</span>
-              <span className="font-mono text-xs text-gray-200 truncate flex-1">{directContact.phone}</span>
+              <span className="font-mono text-xs text-text-primary truncate flex-1">{directContact.phone}</span>
             </div>
             <div className="mt-1.5 ml-36 flex items-center gap-2">
               <button
                 onClick={() => handleCopy(directContact.phone, "phone")}
                 className="flex items-center gap-1.5 font-mono text-[10px] px-2 py-0.5 border rounded-sm cursor-pointer transition-colors duration-150"
                 style={{
-                  borderColor: isCopied("phone") ? "rgba(40,167,69,0.4)" : "rgba(34,38,41,0.8)",
-                  color: isCopied("phone") ? "#28a745" : "#99a4ac",
+                  borderColor: isCopied("phone") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
+                  color: isCopied("phone") ? "var(--color-success)" : "var(--color-text-secondary)",
                 }}
-                onMouseEnter={(e) => { if (!isCopied("phone")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)"; (e.currentTarget as HTMLElement).style.color = "#40cbf6"; } }}
-                onMouseLeave={(e) => { if (!isCopied("phone")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(34,38,41,0.8)"; (e.currentTarget as HTMLElement).style.color = "#99a4ac"; } }}
+                onMouseEnter={(e) => { if (!isCopied("phone")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)"; (e.currentTarget as HTMLElement).style.color = "var(--color-accent)"; } }}
+                onMouseLeave={(e) => { if (!isCopied("phone")) { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-default-border)"; (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; } }}
               >
                 <AnimatePresence mode="wait">
                   {isCopied("phone") ? (
@@ -205,10 +205,10 @@ const Contact = () => {
                   className="group flex items-center gap-3 py-2 border-l-2 border-transparent pl-2 -ml-2 transition-all duration-150 hover:border-accent/40 cursor-pointer"
                 >
                   <Icon size={11} style={{ color: link.color }} className="shrink-0" />
-                  <span className="font-mono text-xs text-text-secondary w-16 shrink-0 group-hover:text-white transition-colors duration-150">
+                  <span className="font-mono text-xs text-text-secondary w-16 shrink-0 group-hover:text-text-primary transition-colors duration-150">
                     {link.name}
                   </span>
-                  <span className="font-mono text-xs text-gray-600 flex-1 group-hover:text-accent transition-colors duration-150">
+                  <span className="font-mono text-xs text-text-muted flex-1 group-hover:text-accent transition-colors duration-150">
                     {link.handle}
                   </span>
                   <ArrowUpRight

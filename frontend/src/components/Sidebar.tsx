@@ -27,7 +27,7 @@ export type SidebarProps = {
 
 const Sidebar = ({ setView, view, theme, setTheme }: SidebarProps) => {
   return (
-    <div className="hidden md:grid grid-cols-[30px_280px_30px] text-white text-center">
+    <div className="hidden md:grid grid-cols-[30px_280px_30px] text-text-primary text-center">
       <div className="py-3"></div>
       <div className="py-3 border-l border-r border-default-border"></div>
       <div className="py-3"></div>
@@ -69,7 +69,7 @@ const Menu = ({ setView, view, theme, setTheme }: SidebarProps) => {
         </div>
         <div className="flex flex-col items-center gap-1.5 w-full">
           <div className="text-center leading-none">
-            <p className="text-base font-black uppercase tracking-tight text-white">Odair Michael</p>
+            <p className="text-base font-black uppercase tracking-tight text-text-primary">Odair Michael</p>
             <p className="text-base font-black uppercase tracking-tight text-accent">Bendotti</p>
           </div>
           <div className="w-8 h-px bg-accent/30" />

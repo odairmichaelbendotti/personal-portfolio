@@ -35,27 +35,74 @@
 }
 
 @theme {
-  --color-background: #090a0b;
+  --color-background:      #090a0b;
   --color-card-background: #1a1a1a;
-  --color-accent: #40cbf6;
-  --color-accent-secondary: #246277;
-  --color-accent-third: #10171b;
-  --color-text-secondary: #99a4ac;
+  --color-accent:          #40cbf6;
+  --color-accent-secondary:#246277;
+  --color-accent-third:    #10171b;
+  --color-text-secondary:  #99a4ac;
+  --color-default-border:  #222629;
 
-  --color-default-border: #222629;
-  --color-secondary: #6c757d;
+  --color-text-primary:    #ffffff;
+  --color-text-code:       #d1d5db;
+  --color-text-muted:      #6b7280;
+
   --color-success: #28a745;
-  --color-danger: #dc3545;
+  --color-danger:  #dc3545;
   --color-warning: #ffc107;
-  --color-info: #17a2b8;
-  --color-light: #f8f9fa;
-  --color-dark: #343a40;
 
   --font-inter: "inter", sans-serif;
 }
 
 @variant light {
-  --color-default-border: #dee2e6;
+  --color-background:      #e8e0d4;
+  --color-card-background: #f2ede6;
+  --color-accent:          #7c5c2e;
+  --color-accent-secondary:#5a3e18;
+  --color-accent-third:    #ddd5c8;
+  --color-text-secondary:  #4a3828;
+  --color-default-border:  #c4b8a8;
+  --color-text-primary:    #1a1208;
+  --color-text-code:       #2e1f0e;
+  --color-text-muted:      #7a6a58;
+}
+
+/* ─── Light mode body override ──────────────────────────────────────────────── */
+
+.light body {
+  background-color: #e8e0d4;
+  background-image:
+    radial-gradient(
+      ellipse 70% 55% at 8% 12%,
+      rgba(124, 92, 46, 0.05) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 92% 88%,
+      rgba(90, 62, 24, 0.03) 0%,
+      transparent 100%
+    );
+  background-attachment: fixed;
+}
+
+.light body::after {
+  display: none;
+}
+
+.light .hachura {
+  background-image: repeating-linear-gradient(
+    45deg,
+    #c4b8a8,
+    1px,
+    transparent 0,
+    transparent 50%
+  );
+}
+
+.light .quadriculado {
+  background-image:
+    linear-gradient(#c4b8a8 0.5px, transparent 1px),
+    linear-gradient(90deg, #c4b8a8 1px, transparent 1px);
 }
 
 /* ─── Deep Space Background ─────────────────────────────────────────────────── */

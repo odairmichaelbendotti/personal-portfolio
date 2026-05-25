@@ -1,4 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const useIsLight = () => {
+  const [isLight, setIsLight] = useState(() =>
+    document.documentElement.classList.contains("light")
+  );
+  useEffect(() => {
+    const obs = new MutationObserver(() =>
+      setIsLight(document.documentElement.classList.contains("light"))
+    );
+    obs.observe(document.documentElement, { attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+  return isLight;
+};
 import ContentLayout from "./Layout/ContentLayout";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -84,6 +98,17 @@ const skillList: Skill[] = [
   { name: "GitHub Actions",icon: SiGithubactions,iconColor: "#2088FF", category: "Infrastructure" },
 ];
 
+const iconColorLight: Record<string, string> = {
+  "JavaScript":   "#b8960a",
+  "React":        "#0ea5c8",
+  "Next.js":      "#1a1a1a",
+  "Express":      "#1a1a1a",
+  "Fastify":      "#1a1a1a",
+  "Socket.io":    "#1a1a1a",
+  "Swagger":      "#4a8a00",
+  "Prisma":       "#1a1a1a",
+};
+
 const categoryConfig: Record<
   Exclude<CategorySkill, "All">,
   { icon: React.ElementType; color: string; description: string }
@@ -127,7 +152,9 @@ const CornerBorders = ({ isActive }: { isActive: boolean }) => (
 
 const FeaturedSkillCard = ({ skill, index }: { skill: Skill; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const isLight = useIsLight();
   const Icon = skill.icon;
+  const color = isLight ? (iconColorLight[skill.name] ?? skill.iconColor) : skill.iconColor;
 
   return (
     <motion.div
@@ -139,7 +166,7 @@ const FeaturedSkillCard = ({ skill, index }: { skill: Skill; index: number }) =>
         border: isHovered
           ? "1px solid rgba(64,203,246,0.6)"
           : "1px solid rgba(64,203,246,0.2)",
-        backgroundColor: isHovered ? "#10171b" : "rgba(26,26,26,0.4)",
+        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-background)",
         transition: "border-color 0.25s, background-color 0.25s",
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -149,17 +176,17 @@ const FeaturedSkillCard = ({ skill, index }: { skill: Skill; index: number }) =>
       <motion.div
         animate={{
           filter: isHovered
-            ? `drop-shadow(0 0 8px ${skill.iconColor})`
+            ? `drop-shadow(0 0 8px ${color})`
             : "drop-shadow(0 0 0px transparent)",
         }}
         transition={{ duration: 0.2 }}
       >
-        <Icon size={32} style={{ color: skill.iconColor }} />
+        <Icon size={32} style={{ color }} />
       </motion.div>
       <span
         className="font-mono text-[10px]"
         style={{
-          color: isHovered ? "#40cbf6" : "#6b7280",
+          color: isHovered ? "var(--color-accent)" : "var(--color-text-muted)",
           transition: "color 0.2s",
         }}
       >
@@ -171,7 +198,9 @@ const FeaturedSkillCard = ({ skill, index }: { skill: Skill; index: number }) =>
 
 const SecondarySkillCard = ({ skill, index }: { skill: Skill; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const isLight = useIsLight();
   const Icon = skill.icon;
+  const color = isLight ? (iconColorLight[skill.name] ?? skill.iconColor) : skill.iconColor;
 
   return (
     <motion.div
@@ -182,8 +211,8 @@ const SecondarySkillCard = ({ skill, index }: { skill: Skill; index: number }) =
       style={{
         border: isHovered
           ? "1px solid rgba(64,203,246,0.4)"
-          : "1px solid rgba(34,38,41,0.6)",
-        backgroundColor: isHovered ? "rgba(16,23,27,0.5)" : "#090a0b",
+          : "1px solid var(--color-default-border)",
+        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-background)",
         transition: "border-color 0.25s, background-color 0.25s",
         aspectRatio: "1",
       }}
@@ -193,17 +222,17 @@ const SecondarySkillCard = ({ skill, index }: { skill: Skill; index: number }) =
       <motion.div
         animate={{
           filter: isHovered
-            ? `drop-shadow(0 0 5px ${skill.iconColor})`
+            ? `drop-shadow(0 0 5px ${color})`
             : "drop-shadow(0 0 0px transparent)",
         }}
         transition={{ duration: 0.2 }}
       >
-        <Icon size={22} style={{ color: skill.iconColor }} />
+        <Icon size={22} style={{ color }} />
       </motion.div>
       <span
         className="font-mono text-[9px]"
         style={{
-          color: isHovered ? "#d1d5db" : "#4b5563",
+          color: isHovered ? "var(--color-text-code)" : "var(--color-text-muted)",
           transition: "color 0.2s",
         }}
       >
@@ -278,7 +307,7 @@ const MobileCategoryCard = ({
                         size={skill.featured ? 18 : 14}
                         style={{ color: skill.iconColor }}
                       />
-                      <span className={skill.featured ? "text-xs text-gray-200" : "text-[10px] text-gray-400"}>
+                      <span className={skill.featured ? "text-xs text-text-code" : "text-[10px] text-text-muted"}>
                         {skill.name}
                       </span>
                     </div>
@@ -297,6 +326,8 @@ const MobileCategoryCard = ({
 const Skills = () => {
   const [activeCategory, setActiveCategory] = useState<CategorySkill>("All");
   const [expandedMobileCategory, setExpandedMobileCategory] = useState<Exclude<CategorySkill, "All"> | null>("Backend");
+  const isLight = useIsLight();
+  const ic = (skill: Skill) => isLight ? (iconColorLight[skill.name] ?? skill.iconColor) : skill.iconColor;
 
   const filteredSkills =
     activeCategory === "All"
@@ -324,7 +355,7 @@ const Skills = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background">
 
         {/* Mobile View */}
         <div className="md:hidden flex flex-col h-full overflow-hidden">
@@ -358,11 +389,11 @@ const Skills = () => {
                     onClick={() => setActiveCategory(cat)}
                     className="relative flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer border-b-2 transition-colors duration-200"
                     style={{
-                      color: isActive ? "#40cbf6" : "#99a4ac",
-                      borderBottomColor: isActive ? "#40cbf6" : "transparent",
+                      color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
+                      borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
                     }}
-                    onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#ffffff"; }}
-                    onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#99a4ac"; }}
+                    onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-primary)"; }}
+                    onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-secondary)"; }}
                   >
                     <TabIcon className="w-3.5 h-3.5" />
                     <span>{cat}</span>
@@ -488,7 +519,7 @@ const Skills = () => {
                                   className="w-7 h-7 flex items-center justify-center border border-default-border/50 bg-background/60 rounded-sm"
                                   title={skill.name}
                                 >
-                                  <SkillIcon size={14} style={{ color: skill.iconColor }} />
+                                  <SkillIcon size={14} style={{ color: ic(skill) }} />
                                 </div>
                               );
                             })}
@@ -538,9 +569,9 @@ const Skills = () => {
                           className="flex items-center gap-2.5 py-1.5 border-b border-default-border/20 last:border-0"
                         >
                           <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                            <SkillIcon size={16} style={{ color: skill.iconColor }} />
+                            <SkillIcon size={16} style={{ color: ic(skill) }} />
                           </div>
-                          <span className="font-mono text-[10px] text-gray-300">{skill.name}</span>
+                          <span className="font-mono text-[10px] text-text-code">{skill.name}</span>
                         </motion.div>
                       );
                     })}
@@ -557,7 +588,7 @@ const Skills = () => {
                                 className="w-6 h-6 flex items-center justify-center border border-default-border/40 bg-background/50 rounded-sm"
                                 title={skill.name}
                               >
-                                <SkillIcon size={13} style={{ color: skill.iconColor }} />
+                                <SkillIcon size={13} style={{ color: ic(skill) }} />
                               </div>
                             );
                           })}

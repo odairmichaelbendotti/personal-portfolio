@@ -133,7 +133,7 @@ const AchievementCard = ({ achievement, index }: { achievement: Achievement; ind
       onMouseLeave={() => setHovered(false)}
       className="relative p-4 rounded-sm cursor-default"
       style={{
-        border: hovered ? "1px solid rgba(64,203,246,0.25)" : "1px solid rgba(34,38,41,0.5)",
+        border: hovered ? "1px solid rgba(64,203,246,0.25)" : "1px solid var(--color-default-border)",
         transition: "border-color 0.2s",
       }}
     >
@@ -143,9 +143,9 @@ const AchievementCard = ({ achievement, index }: { achievement: Achievement; ind
       <p className="font-mono text-[10px] text-text-secondary mt-1 mb-3">
         {achievement.subMetric}
       </p>
-      <p className="text-xs text-gray-500 leading-relaxed">
+      <p className="text-xs text-text-muted leading-relaxed">
         {achievement.text}{" "}
-        <span className="text-gray-300">{achievement.highlight}</span>
+        <span className="text-text-code">{achievement.highlight}</span>
       </p>
     </motion.div>
   );
@@ -166,7 +166,7 @@ const Experience = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background">
 
         {/* Header slim */}
         <motion.div
@@ -179,7 +179,7 @@ const Experience = () => {
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-mono text-xs text-accent">Senior Full Stack Engineer</span>
               <span className="text-text-secondary text-[10px]">·</span>
-              <span className="text-xs text-white/40">Odair Michael Bendotti</span>
+              <span className="text-xs text-text-primary/40">Odair Michael Bendotti</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="font-mono font-bold text-accent text-xs">6+</span>
@@ -211,11 +211,11 @@ const Experience = () => {
                   className="flex items-center justify-between px-4 py-2.5 cursor-pointer text-xs transition-colors duration-150 -ml-px"
                   style={{
                     borderLeft: isActive ? "2px solid #40cbf6" : "2px solid transparent",
-                    color: isActive ? "#40cbf6" : "#99a4ac",
+                    color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
                     backgroundColor: isActive ? "rgba(64,203,246,0.05)" : "transparent",
                   }}
-                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#ffffff"; }}
-                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#99a4ac"; }}
+                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-primary)"; }}
+                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-secondary)"; }}
                 >
                   <span>{item.label}</span>
                   <span className="font-mono text-[10px] text-accent/40">{item.count}</span>

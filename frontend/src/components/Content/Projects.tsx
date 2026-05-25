@@ -191,7 +191,7 @@ const ProjectDetail = ({ project }: { project: Project }) => (
 
     <div className="h-0.5 w-12 mb-4 rounded-full" style={{ backgroundColor: project.color }} />
 
-    <h2 className="text-xl font-bold text-white mb-1">{project.title}</h2>
+    <h2 className="text-xl font-bold text-text-primary mb-1">{project.title}</h2>
 
     <div className="flex items-center flex-wrap gap-2 mb-4 text-xs">
       <span className={`font-mono text-[9px] px-2 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
@@ -225,7 +225,7 @@ const ProjectDetail = ({ project }: { project: Project }) => (
 
     <div className="h-px bg-default-border/30 mb-4" />
 
-    <p className="text-xs text-gray-400 leading-relaxed mb-5">{project.longDescription}</p>
+    <p className="text-xs text-text-muted leading-relaxed mb-5">{project.longDescription}</p>
 
     <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-2">stack</p>
     <div className="flex flex-wrap gap-2">
@@ -239,7 +239,7 @@ const ProjectDetail = ({ project }: { project: Project }) => (
             className="flex items-center gap-1.5 px-2 py-1.5 border border-default-border/50 bg-background/50 rounded-sm hover:border-accent/30 transition-colors group"
           >
             <Icon size={13} style={{ color: entry.color }} />
-            <span className="font-mono text-[10px] text-gray-400 group-hover:text-gray-200 transition-colors">{t}</span>
+            <span className="font-mono text-[10px] text-text-muted group-hover:text-text-code transition-colors">{t}</span>
           </div>
         );
       })}
@@ -265,7 +265,7 @@ const MobileCard = ({ project }: { project: Project }) => (
     <div className="p-3">
     <div className="h-0.5 w-8 mb-2 rounded-full" style={{ backgroundColor: project.color }} />
     <div className="flex items-center gap-2 mb-1">
-      <span className="font-mono text-[10px] text-gray-600">{project.num}</span>
+      <span className="font-mono text-[10px] text-text-muted">{project.num}</span>
       <span
         className="text-[8px]"
         style={{ color: project.color, visibility: project.featured ? "visible" : "hidden" }}
@@ -278,9 +278,9 @@ const MobileCard = ({ project }: { project: Project }) => (
       <span className={`font-mono text-[9px] px-1.5 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
         {project.category}
       </span>
-      <span className="font-mono text-[9px] text-gray-600">{project.year}</span>
+      <span className="font-mono text-[9px] text-text-muted">{project.year}</span>
     </div>
-    <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-2">{project.description}</p>
+    <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-2">{project.description}</p>
     <div className="flex items-center gap-1.5 flex-wrap">
       {project.tech.slice(0, 4).map((t) => {
         const entry = techIconMap[t];
@@ -310,7 +310,7 @@ const Projects = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-background">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background">
 
         {/* Header */}
         <motion.div
@@ -323,7 +323,7 @@ const Projects = () => {
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs text-accent">Projetos</span>
               <span className="text-text-secondary text-[10px]">·</span>
-              <span className="text-xs text-white/40">Odair Michael Bendotti</span>
+              <span className="text-xs text-text-primary/40">Odair Michael Bendotti</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <span className="font-mono font-bold text-accent text-xs">7</span>
@@ -343,11 +343,11 @@ const Projects = () => {
                   onClick={() => setActiveCategory(cat)}
                   className="px-4 py-2.5 text-xs cursor-pointer flex items-center gap-2 border-b-2 transition-colors duration-150"
                   style={{
-                    borderBottomColor: isActive ? "#40cbf6" : "transparent",
-                    color: isActive ? "#40cbf6" : "#99a4ac",
+                    borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
+                    color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
                   }}
-                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#ffffff"; }}
-                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#99a4ac"; }}
+                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-primary)"; }}
+                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-secondary)"; }}
                 >
                   <Icon size={13} />
                   <span>{cat}</span>
@@ -387,20 +387,20 @@ const Projects = () => {
                     onMouseEnter={(e) => {
                       if (!isActive) {
                         const title = (e.currentTarget as HTMLElement).querySelector(".item-title") as HTMLElement;
-                        if (title) title.style.color = "#ffffff";
+                        if (title) title.style.color = "var(--color-text-primary)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
                         const title = (e.currentTarget as HTMLElement).querySelector(".item-title") as HTMLElement;
-                        if (title) title.style.color = "#99a4ac";
+                        if (title) title.style.color = "var(--color-text-secondary)";
                       }
                     }}
                   >
                     <div className="flex items-center gap-2">
                       <span
                         className="font-mono text-[10px]"
-                        style={{ color: isActive ? project.color : "#4b5563" }}
+                        style={{ color: isActive ? project.color : "var(--color-text-muted)" }}
                       >
                         {project.num}
                       </span>
@@ -412,12 +412,12 @@ const Projects = () => {
                       </span>
                       <span
                         className="item-title text-xs font-medium transition-colors duration-150"
-                        style={{ color: isActive ? "#40cbf6" : "#99a4ac" }}
+                        style={{ color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)" }}
                       >
                         {project.title}
                       </span>
                     </div>
-                    <div className="font-mono text-[9px] text-gray-600 ml-8">
+                    <div className="font-mono text-[9px] text-text-muted ml-8">
                       {project.category} · {project.year}
                     </div>
                   </motion.button>

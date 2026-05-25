@@ -71,7 +71,7 @@ const QuestionPill = ({
       className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm font-mono text-[10px] transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
         hovered
           ? "border-accent/50 bg-accent/5 text-accent"
-          : "border-default-border bg-background text-gray-300"
+          : "border-default-border bg-background text-text-code"
       }`}
     >
       <span className="relative inline-block w-4 shrink-0">
@@ -122,7 +122,7 @@ const About = () => {
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden bg-background pb-20 md:pb-0">
+      <div className="h-full w-full flex flex-col overflow-hidden bg-card-background pb-20 md:pb-0">
 
         {/* Greeting + pills */}
         <motion.div
@@ -132,9 +132,9 @@ const About = () => {
           className="shrink-0 px-4 sm:px-6 pt-5 pb-4 flex flex-col gap-4"
         >
           {/* Greeting message */}
-          <div className="border-l-2 border-accent bg-accent/5 px-3 py-2 rounded-sm">
+          <div className="border-l-2 border-accent bg-accent/10 px-3 py-2 rounded-sm">
             <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
-            <span className="text-xs text-gray-300 leading-relaxed">{chatData.greeting}</span>
+            <span className="text-xs text-text-code leading-relaxed">{chatData.greeting}</span>
           </div>
 
           {/* Pills inline */}
@@ -199,12 +199,12 @@ const About = () => {
                 <div className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm">
                   <span className="font-mono text-xs">
                     <span className="text-accent mr-2">&gt;</span>
-                    <span className="text-white">{entry.question}</span>
+                    <span className="text-text-primary">{entry.question}</span>
                   </span>
                 </div>
                 <div className="border-l border-default-border/30 px-3 py-2">
                   <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
-                  <span className="text-gray-300 text-xs leading-relaxed">{entry.answer}</span>
+                  <span className="text-text-code text-xs leading-relaxed">{entry.answer}</span>
                 </div>
               </motion.div>
             ))}

@@ -15,8 +15,17 @@ export const Resume = () => {
     }
     return "About me";
   });
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("light");
+    } else {
+      root.classList.remove("light");
+    }
+  }, [theme]);
 
   useEffect(() => {
     const handleResize = () => {
