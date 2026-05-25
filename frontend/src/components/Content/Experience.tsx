@@ -1,457 +1,350 @@
-import { motion, AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { motion } from "motion/react";
 import ContentLayout from "./Layout/ContentLayout";
-import { useState, useRef } from "react";
 import {
-  Zap,
-  Server,
-  Database,
-  Container,
-  CreditCard,
-  FileText,
-  Code2,
-  TrendingUp,
-  GitBranch,
-  TestTube,
-  Cpu,
-  Layers,
-  Building2,
-  Calendar,
-  Briefcase,
-  ChevronRight,
-} from "lucide-react";
+  SiNodedotjs,
+  SiTypescript,
+  SiReact,
+  SiNextdotjs,
+  SiDocker,
+  SiPostgresql,
+  SiMongodb,
+  SiJest,
+} from "react-icons/si";
+import { FaAws } from "react-icons/fa";
 
-// Tech icons mapping (from Projects.tsx pattern)
-const techIconMap: Record<string, string> = {
-  "Node.js": "./icons/backend/nodejs.svg",
-  TypeScript: "./icons/backend/typescript.svg",
-  React: "./icons/frontend/react.svg",
-  "Next.js": "./icons/frontend/nextjs.svg",
-  AWS: "./icons/infrastructure/aws.svg",
-  Docker: "./icons/infrastructure/docker.svg",
-  PostgreSQL: "./icons/database/postgresql.svg",
-  MongoDB: "./icons/database/mongodb.svg",
-  Jest: "./icons/backend/jest.svg",
+type AchievementCategory = "performance" | "devops" | "architecture" | "testing" | "feature";
+type GroupId = "all" | "perf" | "devops" | "sistemas" | "qualidade";
+
+type Achievement = {
+  id: string;
+  metric: string;
+  subMetric: string;
+  text: string;
+  highlight: string;
+  category: AchievementCategory;
 };
 
-// Grouped achievements for better organization
-const achievementGroups = [
+type AchievementGroup = {
+  id: GroupId;
+  title: string;
+  achievements: Achievement[];
+};
+
+const achievementGroups: AchievementGroup[] = [
   {
-    title: "Performance & Otimização",
-    icon: Zap,
+    id: "perf",
+    title: "Performance",
     achievements: [
       {
         id: "perf-1",
-        text: "Rearquiteturou backend monolítico em ",
-        highlight: "microserviços com DDD",
-        metric: "3× mais requisições",
-        subMetric: "latência 900ms → 350ms",
-        icon: Layers,
-        category: "architecture" as const,
+        metric: "3× capacidade",
+        subMetric: "900ms → 350ms de resposta",
+        text: "Reestruturou um sistema backend monolítico para arquitetura de microsserviços com Clean Architecture e DDD, usando Node.js, TypeScript e AWS. O resultado foi ",
+        highlight: "3× mais requisições simultâneas e latência reduzida de 900ms para 350ms.",
+        category: "architecture",
       },
       {
         id: "perf-2",
-        text: "Otimizou dashboard administrativo com ",
-        highlight: "SQL otimizado",
         metric: "12s → ~2s",
-        subMetric: "resposta de queries",
-        icon: Database,
-        category: "performance" as const,
+        subMetric: "tempo de carregamento",
+        text: "Desenvolveu módulo de gestão de notas fiscais, ordens de compra e contas a pagar. Otimizou queries SQL e migrou para banco relacional, reduzindo o tempo de carregamento do painel de ",
+        highlight: "12 segundos para menos de 2 segundos.",
+        category: "performance",
       },
     ],
   },
   {
-    title: "DevOps & Automação",
-    icon: GitBranch,
+    id: "devops",
+    title: "DevOps",
     achievements: [
       {
         id: "devops-1",
-        text: "Implementou ",
-        highlight: "CI/CD com GitHub Actions",
         metric: "2h → 12min",
-        subMetric: "tempo de deployment",
-        icon: Server,
-        category: "devops" as const,
+        subMetric: "tempo de publicação",
+        text: "Projetou e implementou pipeline de CI/CD com GitHub Actions, automatizando build, testes e deploy de aplicações Node.js e Next.js. O processo que levava 2 horas passou a ser concluído em ",
+        highlight: "12 minutos, sem intervenção manual.",
+        category: "devops",
       },
       {
         id: "devops-2",
-        text: "Containerizou stack com ",
-        highlight: "Docker",
-        metric: "100%",
-        subMetric: "consistência de ambiente",
-        icon: Container,
-        category: "devops" as const,
+        metric: "Zero divergências",
+        subMetric: "entre ambientes",
+        text: "Containerizou toda a stack backend e frontend com Docker, tornando o ambiente de desenvolvimento idêntico ao de produção e ",
+        highlight: "eliminando falhas causadas por diferenças de configuração.",
+        category: "devops",
       },
       {
         id: "devops-3",
-        text: "Automatizou relatórios financeiros",
-        highlight: "automação completa",
-        metric: "~13h economizadas",
-        subMetric: "semanais",
-        icon: FileText,
-        category: "devops" as const,
+        metric: "~13h/semana",
+        subMetric: "recuperadas pelo time",
+        text: "Automatizou a geração de relatórios financeiros que antes eram feitos manualmente, eliminando erros humanos na consolidação de dados e devolvendo ao time ",
+        highlight: "cerca de 13 horas de trabalho por semana.",
+        category: "devops",
       },
     ],
   },
   {
-    title: "Sistemas & APIs",
-    icon: Code2,
+    id: "sistemas",
+    title: "Sistemas",
     achievements: [
       {
         id: "api-1",
-        text: "Desenvolveu módulo de estimativa para ",
-        highlight: "construção civil",
-        metric: "Precisão",
-        subMetric: "orçamentária otimizada",
-        icon: Building2,
-        category: "feature" as const,
+        metric: "Orçamentos precisos",
+        subMetric: "em segundos",
+        text: "Criou módulo completo de estimativa de custos para construção civil integrado à base de dados governamental, com backend em Node.js, TypeScript e PostgreSQL e interface em React. Reduziu o tempo de elaboração de propostas e ",
+        highlight: "aumentou significativamente a precisão dos orçamentos.",
+        category: "feature",
       },
       {
         id: "api-2",
-        text: "Construiu sistema ",
-        highlight: "real-time com WebSockets",
-        metric: "Notificações",
-        subMetric: "instantâneas",
-        icon: Cpu,
-        category: "feature" as const,
+        metric: "Tempo real",
+        subMetric: "sem recarregar a página",
+        text: "Projetou e implementou sistema de notificações em tempo real substituindo polling por WebSockets com Node.js, TypeScript, React e Next.js, garantindo que todos os usuários recebam ",
+        highlight: "atualizações instantâneas e sincronizadas.",
+        category: "feature",
       },
       {
         id: "api-3",
-        text: "Desenhou ",
-        highlight: "API de pagamentos",
         metric: "Alta concorrência",
-        subMetric: "rastreabilidade financeira",
-        icon: CreditCard,
-        category: "architecture" as const,
+        subMetric: "rastreabilidade total",
+        text: "Arquitetou API de controle de pagamentos com Node.js, TypeScript e MongoDB, projetada para processar ",
+        highlight: "múltiplas transações simultâneas com rastreabilidade financeira completa.",
+        category: "architecture",
       },
     ],
   },
   {
-    title: "Qualidade & Testes",
-    icon: TestTube,
+    id: "qualidade",
+    title: "Qualidade",
     achievements: [
       {
         id: "test-1",
-        text: "Implementou testes com Jest, alcançando ",
-        highlight: "60% cobertura",
-        metric: "Confiabilidade",
-        subMetric: "em produção aumentada",
-        icon: TrendingUp,
-        category: "testing" as const,
+        metric: "60% de cobertura",
+        subMetric: "testes automatizados",
+        text: "Implementou testes unitários e de integração com Jest e TypeScript, garantindo que falhas sejam detectadas automaticamente antes de qualquer atualização chegar ao usuário final. Alcançou ",
+        highlight: "60% de cobertura de testes e aumentou a confiabilidade do sistema em produção.",
+        category: "testing",
       },
     ],
   },
 ];
 
-const categoryBadgeColors = {
-  performance: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-  devops: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
-  architecture: "bg-purple-500/10 text-purple-400 border-purple-500/30",
-  testing: "bg-green-500/10 text-green-400 border-green-500/30",
-  feature: "bg-accent/10 text-accent border-accent/30",
+const techStack = [
+  { name: "Node.js",    icon: SiNodedotjs,   color: "#339933" },
+  { name: "TypeScript", icon: SiTypescript,  color: "#3178C6" },
+  { name: "React",      icon: SiReact,       color: "#61DAFB" },
+  { name: "Next.js",    icon: SiNextdotjs,   color: "#ffffff" },
+  { name: "AWS",        icon: FaAws,         color: "#FF9900" },
+  { name: "Docker",     icon: SiDocker,      color: "#2496ED" },
+  { name: "PostgreSQL", icon: SiPostgresql,  color: "#4169E1" },
+  { name: "MongoDB",    icon: SiMongodb,     color: "#47A248" },
+  { name: "Jest",       icon: SiJest,        color: "#C21325" },
+];
+
+const categoryChipColors: Record<AchievementCategory, string> = {
+  performance: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  devops:      "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  architecture:"bg-purple-500/10 text-purple-400 border-purple-500/20",
+  testing:     "bg-green-500/10 text-green-400 border-green-500/20",
+  feature:     "bg-accent/10 text-accent border-accent/20",
 };
 
-const TechIcon = ({ tech }: { tech: string }) => {
-  const iconPath = techIconMap[tech];
-  if (!iconPath) return null;
+const totalCount = achievementGroups.reduce((s, g) => s + g.achievements.length, 0);
 
-  return (
-    <div className="relative group/tooltip">
-      <div className="w-7 h-7 sm:w-8 sm:h-8 p-1 bg-background/80 border border-default-border/50 rounded-sm flex items-center justify-center hover:border-accent/50 hover:scale-110 transition-all duration-200">
-        <img
-          src={iconPath}
-          alt={tech}
-          className="w-full h-full object-contain"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
-        />
-      </div>
-      {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-card-background border border-default-border/50 rounded-sm opacity-0 group-hover/tooltip:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-1">
-        <span className="text-[10px] text-gray-300">{tech}</span>
-        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-card-background" />
-      </div>
-    </div>
-  );
-};
-
-const MetricBadge = ({
-  metric,
-  subMetric,
-}: {
-  metric: string;
-  subMetric: string;
-}) => (
-  <div className="inline-flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 px-2 py-1 bg-accent/10 border border-accent/30 rounded-sm">
-    <span className="text-[10px] sm:text-xs font-bold text-accent">
-      {metric}
-    </span>
-    <span className="hidden sm:block w-px h-3 bg-accent/30" />
-    <span className="text-[9px] sm:text-[10px] text-accent/80">
-      {subMetric}
-    </span>
-  </div>
-);
-
-const AchievementCard = ({
-  achievement,
-  index,
-}: {
-  achievement: (typeof achievementGroups)[0]["achievements"][0];
-  index: number;
-}) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const Icon = achievement.icon;
+const AchievementCard = ({ achievement, index }: { achievement: Achievement; index: number }) => {
+  const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.25, delay: index * 0.05 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative"
-    >
-      <div className="flex gap-3 sm:gap-4">
-        {/* Timeline */}
-        <div className="flex flex-col items-center shrink-0">
-          <motion.div
-            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-sm border flex items-center justify-center ${categoryBadgeColors[achievement.category]}`}
-            animate={{
-              scale: isHovered ? 1.1 : 1,
-              rotate: isHovered ? 5 : 0,
-            }}
-            transition={{ duration: 0.2 }}
-          >
-            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
-          </motion.div>
-          <div className="w-px flex-1 bg-linear-to-b from-accent/40 via-accent/20 to-transparent min-h-10" />
-        </div>
-
-        {/* Content Card */}
-        <div className="flex-1 pb-4">
-          <motion.div
-            animate={{ x: isHovered ? 4 : 0 }}
-            transition={{ duration: 0.2 }}
-            className="relative p-3 sm:p-4 bg-card-background border border-default-border rounded-sm overflow-hidden group-hover:border-accent/30 transition-colors duration-300"
-          >
-            {/* Corner accents */}
-            <motion.div
-              animate={{ opacity: isHovered ? 1 : 0.2 }}
-              className="absolute top-0 left-0 w-3 h-3 border-t border-l border-accent"
-            />
-            <motion.div
-              animate={{ opacity: isHovered ? 1 : 0.2 }}
-              className="absolute top-0 right-0 w-3 h-3 border-t border-r border-accent"
-            />
-            <motion.div
-              animate={{ opacity: isHovered ? 1 : 0.2 }}
-              className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-accent"
-            />
-            <motion.div
-              animate={{ opacity: isHovered ? 1 : 0.2 }}
-              className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-accent"
-            />
-
-            <div className="relative z-1">
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-2">
-                {achievement.text}
-                <span className="font-semibold text-accent ml-0.5">
-                  {achievement.highlight}
-                </span>
-              </p>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <MetricBadge
-                  metric={achievement.metric}
-                  subMetric={achievement.subMetric}
-                />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-const ExperienceGroup = ({
-  group,
-  index,
-  defaultExpanded = false,
-}: {
-  group: (typeof achievementGroups)[0];
-  index: number;
-  defaultExpanded?: boolean;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const Icon = group.icon;
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const handleToggle = () => {
-    const newState = !isExpanded;
-    setIsExpanded(newState);
-
-    // Auto-scroll para o fim quando expandir o último grupo
-    if (newState && index === achievementGroups.length - 1) {
-      setTimeout(() => {
-        contentRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "end",
-        });
-      }, 50);
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.15 }}
-      className="mb-6"
+      transition={{ duration: 0.2, delay: index * 0.04 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative p-3 rounded-sm cursor-default"
+      style={{
+        border: hovered ? "1px solid rgba(64,203,246,0.3)" : "1px solid rgba(34,38,41,0.6)",
+        backgroundColor: hovered ? "rgba(16,23,27,0.3)" : "rgba(26,26,26,0.3)",
+        transition: "border-color 0.2s, background-color 0.2s",
+      }}
     >
-      {/* Group Header */}
-      <button
-        onClick={handleToggle}
-        className="w-full flex items-center justify-between p-2 sm:p-3 mb-3 bg-linear-to-r from-accent/5 to-transparent border-l-2 border-accent rounded-r-sm hover:from-accent/10 transition-colors cursor-pointer"
-      >
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-          <h3 className="text-sm sm:text-base font-semibold text-gray-200">
-            {group.title}
-          </h3>
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <div>
+          <p className="font-mono text-xl font-bold text-accent leading-none">
+            {achievement.metric}
+          </p>
+          <p className="font-mono text-[10px] text-text-secondary mt-1">
+            {achievement.subMetric}
+          </p>
         </div>
-        <motion.div
-          animate={{ rotate: isExpanded ? 90 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="text-accent/60"
-        >
-          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-        </motion.div>
-      </button>
+        <span className={`font-mono text-[9px] px-2 py-0.5 rounded-sm border shrink-0 ${categoryChipColors[achievement.category]}`}>
+          {achievement.category}
+        </span>
+      </div>
 
-      {/* Achievement Cards */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            ref={contentRef}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="ml-1 sm:ml-2"
-          >
-            {group.achievements.map((achievement, idx) => (
-              <AchievementCard
-                key={achievement.id}
-                achievement={achievement}
-                index={idx}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="h-px bg-default-border/30 mb-2" />
+
+      <p className="text-xs text-gray-500 leading-relaxed">
+        {achievement.text}{" "}
+        <span className="text-gray-200 font-medium">{achievement.highlight}</span>
+      </p>
     </motion.div>
   );
 };
 
 const Experience = () => {
-  const techStack = [
-    "Node.js",
-    "TypeScript",
-    "React",
-    "Next.js",
-    "AWS",
-    "Docker",
-    "PostgreSQL",
-    "MongoDB",
-    "Jest",
+  const [activeGroup, setActiveGroup] = useState<GroupId>("all");
+
+  const visibleAchievements =
+    activeGroup === "all"
+      ? achievementGroups.flatMap((g) => g.achievements)
+      : achievementGroups.find((g) => g.id === activeGroup)?.achievements ?? [];
+
+  const navItems: { id: GroupId; label: string; count: number }[] = [
+    { id: "all", label: "All", count: totalCount },
+    ...achievementGroups.map((g) => ({ id: g.id, label: g.title, count: g.achievements.length })),
   ];
 
   return (
     <ContentLayout>
-      <div className="h-full w-full flex flex-col overflow-hidden">
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-3">
-          {/* Header */}
+      <div className="h-full w-full flex flex-col overflow-hidden bg-background">
+
+        {/* Header slim */}
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="shrink-0 px-4 py-3"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-mono text-xs text-accent">Senior Full Stack Engineer</span>
+              <span className="text-text-secondary text-[10px]">·</span>
+              <span className="text-xs text-white/40">Odair Michael Bendotti</span>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="font-mono font-bold text-accent text-xs">6+</span>
+              <span className="text-[10px] text-text-secondary">anos</span>
+              <span className="text-text-secondary text-[10px] mx-1">·</span>
+              <span className="font-mono font-bold text-accent text-xs">{totalCount}</span>
+              <span className="text-[10px] text-text-secondary">conquistas</span>
+            </div>
+          </div>
+          <div className="mt-3 h-px bg-linear-to-r from-accent/30 via-default-border to-transparent" />
+        </motion.div>
+
+        {/* Body: nav + content */}
+        <div className="flex flex-1 min-h-0">
+
+          {/* Nav lateral */}
           <motion.div
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="border-b border-default-border/50 pb-3"
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+            className="shrink-0 w-40 border-r border-default-border/40 flex flex-col py-2 overflow-hidden"
           >
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 border border-accent/30 bg-accent/10 flex items-center justify-center rounded-sm shrink-0">
-                <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl font-bold text-accent mb-1">
-                  Senior Full Stack Engineer
-                </h2>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <Building2 className="w-3 h-3" />
-                    Empresa Tecnologia
-                  </span>
-                  <span className="hidden sm:inline">•</span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    2022 - Presente
-                  </span>
+            {navItems.map((item) => {
+              const isActive = activeGroup === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveGroup(item.id)}
+                  className="flex items-center justify-between px-4 py-2.5 cursor-pointer text-xs transition-colors duration-150 -ml-px"
+                  style={{
+                    borderLeft: isActive ? "2px solid #40cbf6" : "2px solid transparent",
+                    color: isActive ? "#40cbf6" : "#99a4ac",
+                    backgroundColor: isActive ? "rgba(64,203,246,0.05)" : "transparent",
+                  }}
+                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#ffffff"; }}
+                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "#99a4ac"; }}
+                >
+                  <span>{item.label}</span>
+                  <span className="font-mono text-[10px] text-accent/40">{item.count}</span>
+                </button>
+              );
+            })}
+
+            <div className="border-t border-default-border/30 mx-4 my-3" />
+
+            <div className="flex flex-col gap-3 px-4">
+              <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">// impacto</p>
+
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-mono text-sm font-bold text-accent leading-none">~13h</span>
+                  <span className="font-mono text-[9px] text-text-secondary">/semana</span>
                 </div>
+                <p className="text-[9px] text-gray-600 leading-snug">devolvidas ao time via automação</p>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-mono text-sm font-bold text-accent leading-none">3×</span>
+                  <span className="font-mono text-[9px] text-text-secondary">mais requisições</span>
+                </div>
+                <p className="text-[9px] text-gray-600 leading-snug">após reescrita da arquitetura</p>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-mono text-sm font-bold text-accent leading-none">−83%</span>
+                  <span className="font-mono text-[9px] text-text-secondary">no tempo</span>
+                </div>
+                <p className="text-[9px] text-gray-600 leading-snug">de carregamento do painel</p>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-mono text-sm font-bold text-accent leading-none">10×</span>
+                  <span className="font-mono text-[9px] text-text-secondary">mais rápido</span>
+                </div>
+                <p className="text-[9px] text-gray-600 leading-snug">no ciclo de deploy</p>
               </div>
             </div>
-            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-              Responsável pela arquitetura, desenvolvimento e otimização de
-              sistemas críticos, liderando iniciativas de performance e DevOps.
-            </p>
           </motion.div>
 
-          {/* Timeline - All Achievements */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="space-y-1"
-          >
-            {achievementGroups.map((group, index) => (
-              <ExperienceGroup
-                key={group.title}
-                group={group}
-                index={index}
-                defaultExpanded={index === 0}
-              />
-            ))}
-          </motion.div>
+          {/* Achievement area */}
+          <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
+            <motion.div
+              key={activeGroup}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.18 }}
+              className="flex flex-col gap-3"
+            >
+              {visibleAchievements.map((achievement, i) => (
+                <AchievementCard key={achievement.id} achievement={achievement} index={i} />
+              ))}
+            </motion.div>
+          </div>
+
         </div>
 
+        {/* Tech stack footer */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-          className="shrink-0 px-2 sm:px-3 py-2 border-t border-default-border/30 bg-linear-to-t from-background to-card-background/50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="shrink-0 border-t border-default-border/40 px-4 py-2.5 flex items-center gap-1 flex-wrap"
         >
-          <div className="flex items-center justify-between mb-1.5">
-            <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-              Stack Principal
-            </p>
-            <span className="text-[9px] text-gray-500">
-              {techStack.length} tecnologias
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {techStack.map((tech) => (
-              <motion.div
-                key={tech}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="cursor-pointer"
+          <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mr-2">stack</span>
+          {techStack.map((tech) => {
+            const Icon = tech.icon;
+            return (
+              <div
+                key={tech.name}
+                className="flex items-center gap-1.5 px-2 py-1 border border-default-border/50 bg-background rounded-sm transition-colors duration-150 hover:border-accent/30 group"
               >
-                <TechIcon tech={tech} />
-              </motion.div>
-            ))}
-          </div>
+                <Icon size={12} style={{ color: tech.color }} />
+                <span className="font-mono text-[9px] text-gray-500 group-hover:text-gray-300 transition-colors duration-150">
+                  {tech.name}
+                </span>
+              </div>
+            );
+          })}
         </motion.div>
+
       </div>
     </ContentLayout>
   );
