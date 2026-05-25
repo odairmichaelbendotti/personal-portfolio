@@ -62,15 +62,21 @@ const Menu = ({ setView, view, theme, setTheme }: SidebarProps) => {
         )}
       </div>
 
-      {/* User image and name with skills badges */}
-      <div className="flex flex-col items-center px-4 border-b border-default-border py-6">
-        <div className="max-w-40 w-full min-h-40 h-full bg-accent flex items-center justify-center rounded-md">
-          1
+      {/* User image and name */}
+      <div className="flex flex-col items-center px-4 border-b border-default-border py-6 gap-4">
+        <div className="w-20 h-20 border border-default-border bg-accent-third flex items-center justify-center rounded-sm shrink-0">
+          <span className="font-mono text-lg font-bold text-accent tracking-widest">OB</span>
         </div>
-        <p className="font-medium text-sm mt-1">Odair Michael Bendotti</p>
-        <span className="text-accent text-sm">
-          Full-stack Software Engineer
-        </span>
+        <div className="flex flex-col items-center gap-1.5 w-full">
+          <div className="text-center leading-none">
+            <p className="text-base font-black uppercase tracking-tight text-white">Odair Michael</p>
+            <p className="text-base font-black uppercase tracking-tight text-accent">Bendotti</p>
+          </div>
+          <div className="w-8 h-px bg-accent/30" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-text-secondary text-center">
+            Full-stack Software Engineer
+          </span>
+        </div>
       </div>
       <nav className="border-b border-default-border flex-1">
         <ul className="px-4 mt-3">

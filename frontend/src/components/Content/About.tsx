@@ -3,47 +3,40 @@ import ContentLayout from "./Layout/ContentLayout";
 import { motion, AnimatePresence } from "motion/react";
 
 const chatData = {
-  greeting:
-    "Olá! Sou Odair, desenvolvedor full stack com 6+ anos de experiência criando soluções digitais excepcionais.",
+  greeting: "Olá! Sou Odair, desenvolvedor full stack com 6+ anos de experiência criando soluções digitais excepcionais.",
   questions: [
     {
       id: 1,
       label: "Especialidade",
       question: "Qual é sua especialidade?",
-      answer:
-        "Minha especialidade está em transformar requisitos complexos em sistemas elegantes e performáticos, mantendo o código limpo e facilitando futuras manutenções.",
+      answer: "Minha especialidade está em transformar requisitos complexos em sistemas elegantes e performáticos, mantendo o código limpo e facilitando futuras manutenções.",
     },
     {
       id: 2,
       label: "Stack",
       question: "Em quais tecnologias você trabalha?",
-      answer:
-        "Trabalho com React/Next.js no frontend, Node.js no backend, TypeScript, banco de dados, Docker e CI/CD. Tenho experiência completa em full stack.",
+      answer: "Trabalho com React/Next.js no frontend, Node.js no backend, TypeScript, banco de dados, Docker e CI/CD. Tenho experiência completa em full stack.",
     },
     {
       id: 3,
       label: "Abordagem",
       question: "Como você aborda um novo projeto?",
-      answer:
-        "Começo entendendo os requisitos e o contexto, desenho a arquitetura focando em escalabilidade, depois implemento com code review e testes. Sempre pensando no usuário final.",
+      answer: "Começo entendendo os requisitos e o contexto, desenho a arquitetura focando em escalabilidade, depois implemento com code review e testes. Sempre pensando no usuário final.",
     },
     {
       id: 4,
       label: "Filosofia",
       question: "Qual é sua filosofia de desenvolvimento?",
-      answer:
-        "Código limpo, legível e testável. Toda decisão técnica deve considerar manutenibilidade futura e impacto na experiência do usuário. Aprendizado contínuo é fundamental.",
+      answer: "Código limpo, legível e testável. Toda decisão técnica deve considerar manutenibilidade futura e impacto na experiência do usuário. Aprendizado contínuo é fundamental.",
     },
     {
       id: 5,
       label: "Projetos",
       question: "Quantos projetos você já desenvolveu?",
-      answer:
-        "Mais de 50 projetos concluídos, desde MVPs até aplicações em produção com milhares de usuários. Cada projeto me ensinou algo novo.",
+      answer: "Mais de 50 projetos concluídos, desde MVPs até aplicações em produção com milhares de usuários. Cada projeto me ensinou algo novo.",
     },
   ],
 };
-
 
 type TranscriptEntry = {
   id: number;
@@ -82,18 +75,10 @@ const QuestionPill = ({
       }`}
     >
       <span className="relative inline-block w-4 shrink-0">
-        <span
-          className={`absolute inset-0 flex items-center justify-center transition-all duration-150 ${
-            hovered ? "opacity-100 text-accent" : "opacity-0 text-accent"
-          }`}
-        >
+        <span className={`absolute inset-0 flex items-center justify-center transition-all duration-150 ${hovered ? "opacity-100" : "opacity-0"} text-accent`}>
           →
         </span>
-        <span
-          className={`flex items-center justify-center transition-all duration-150 ${
-            hovered ? "opacity-0 text-accent" : "opacity-100 text-accent/60"
-          }`}
-        >
+        <span className={`flex items-center justify-center transition-all duration-150 ${hovered ? "opacity-0" : "opacity-100"} text-accent/60`}>
           {num}
         </span>
       </span>
@@ -139,65 +124,64 @@ const About = () => {
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-background pb-20 md:pb-0">
 
-        {/* Zone 1 — Identity Block */}
-        <div className="shrink-0 px-4 sm:px-6 pt-5 sm:pt-6 pb-4">
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <h1 className="leading-tight">
-              <span className="text-3xl sm:text-4xl font-black tracking-tight text-accent">Odair</span>
-              <span className="text-3xl sm:text-4xl font-light tracking-wide text-white/40 ml-2">Michael Bendotti</span>
-            </h1>
-          </motion.div>
+        {/* Greeting + pills */}
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="shrink-0 px-4 sm:px-6 pt-5 pb-4 flex flex-col gap-4"
+        >
+          {/* Greeting message */}
+          <div className="border-l-2 border-accent bg-accent/5 px-3 py-2 rounded-sm">
+            <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
+            <span className="text-xs text-gray-300 leading-relaxed">{chatData.greeting}</span>
+          </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.08, ease: [0.25, 0.1, 0.25, 1] }}
-            className="mt-1.5 text-[10px] sm:text-xs text-text-secondary uppercase tracking-widest font-medium"
-          >
-            Full-stack Software Engineer
-          </motion.p>
+          {/* Pills inline */}
+          <div className="flex flex-col gap-2">
+            <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">
+              // perguntas
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <AnimatePresence mode="popLayout">
+                {availableQuestions.map((q, i) => (
+                  <QuestionPill
+                    key={`${pillKey}-${q.id}`}
+                    question={q}
+                    index={i}
+                    onSelect={() => handleSelect(q)}
+                    disabled={isTyping}
+                  />
+                ))}
+              </AnimatePresence>
 
-          <motion.p
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.16, ease: [0.25, 0.1, 0.25, 1] }}
-            className="mt-3 text-xs text-gray-400 leading-relaxed"
-          >
-            <span className="text-accent font-mono font-semibold">6+</span>
-            <span className="text-gray-600 mx-1.5">anos</span>
-            <span className="text-gray-700 mx-1">·</span>
-            <span className="text-accent font-mono font-semibold mx-1.5">50+</span>
-            <span className="text-gray-600">projetos</span>
-            <span className="text-gray-700 mx-2">·</span>
-            Arquiteto de sistemas e interfaces, apaixonado por
-            performance e experiências que escalam.
-          </motion.p>
+              {availableQuestions.length === 0 && !isTyping && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-[10px] font-mono text-text-secondary italic"
+                >
+                  // todas as perguntas respondidas
+                </motion.p>
+              )}
+            </div>
+          </div>
 
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.7, delay: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
-            style={{ originX: 0 }}
-            className="mt-4 h-px bg-linear-to-r from-accent/40 via-default-border to-transparent"
-          />
-        </div>
+          <div className="h-px bg-linear-to-r from-accent/30 via-default-border to-transparent" />
+        </motion.div>
 
-        {/* Zone 2 — Transcript */}
+        {/* Transcript */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.55, delay: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.4, delay: 0.12, ease: [0.25, 0.1, 0.25, 1] }}
           className="flex-1 overflow-y-auto scrollbar-hide px-4 sm:px-6 py-3 flex flex-col gap-3"
         >
           {transcript.length === 0 && !isTyping && (
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-xs font-mono text-text-secondary">
+              <p className="text-xs font-mono text-text-secondary/50">
                 <span className="text-accent animate-pulse">▍</span>
-                {" "}// selecione uma pergunta abaixo
+                {" "}aguardando seleção
               </p>
             </div>
           )}
@@ -206,22 +190,18 @@ const About = () => {
             {transcript.map((entry, i) => (
               <motion.div
                 key={entry.id}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.25 }}
                 className="flex flex-col gap-0"
               >
-                {i > 0 && (
-                  <hr className="border-default-border/20 mb-3" />
-                )}
-                {/* Question line */}
+                {i > 0 && <hr className="border-default-border/20 mb-3" />}
                 <div className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm">
                   <span className="font-mono text-xs">
                     <span className="text-accent mr-2">&gt;</span>
                     <span className="text-white">{entry.question}</span>
                   </span>
                 </div>
-                {/* Answer block */}
                 <div className="border-l border-default-border/30 px-3 py-2">
                   <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
                   <span className="text-gray-300 text-xs leading-relaxed">{entry.answer}</span>
@@ -230,7 +210,6 @@ const About = () => {
             ))}
           </AnimatePresence>
 
-          {/* Typing indicator */}
           {isTyping && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -247,53 +226,18 @@ const About = () => {
           <div ref={transcriptEndRef} />
         </motion.div>
 
-        {/* Zone 3 — Question Dock */}
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.34, ease: [0.25, 0.1, 0.25, 1] }}
-          className="shrink-0 border-t border-default-border/40 px-4 sm:px-6 pt-3 pb-3 sm:pb-4 flex flex-col gap-2.5"
-        >
-          <p className="text-[10px] text-text-secondary tracking-widest text-center font-mono select-none">
-            ── selecione ──
-          </p>
-
-          <div className="flex flex-wrap gap-2 justify-center min-h-8">
-            <AnimatePresence mode="popLayout">
-              {availableQuestions.map((q, i) => (
-                <QuestionPill
-                  key={`${pillKey}-${q.id}`}
-                  question={q}
-                  index={i}
-                  onSelect={() => handleSelect(q)}
-                  disabled={isTyping}
-                />
-              ))}
-            </AnimatePresence>
-
-            {availableQuestions.length === 0 && !isTyping && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-[10px] font-mono text-text-secondary italic"
-              >
-                // todas as perguntas respondidas
-              </motion.p>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-text-secondary font-mono">
-              {answeredCount}/{chatData.questions.length} respondidas
-            </span>
-            <button
-              onClick={handleReset}
-              className="text-[10px] font-mono text-accent/50 hover:text-accent transition-colors cursor-pointer"
-            >
-              ↺ reiniciar
-            </button>
-          </div>
-        </motion.div>
+        {/* Footer */}
+        <div className="shrink-0 border-t border-default-border/40 px-4 sm:px-6 py-2.5 flex items-center justify-between">
+          <span className="text-[10px] text-text-secondary font-mono">
+            {answeredCount}/{chatData.questions.length} respondidas
+          </span>
+          <button
+            onClick={handleReset}
+            className="text-[10px] font-mono text-accent/50 hover:text-accent transition-colors cursor-pointer"
+          >
+            ↺ reiniciar
+          </button>
+        </div>
 
       </div>
     </ContentLayout>

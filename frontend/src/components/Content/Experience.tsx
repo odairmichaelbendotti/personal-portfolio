@@ -1,17 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import ContentLayout from "./Layout/ContentLayout";
-import {
-  SiNodedotjs,
-  SiTypescript,
-  SiReact,
-  SiNextdotjs,
-  SiDocker,
-  SiPostgresql,
-  SiMongodb,
-  SiJest,
-} from "react-icons/si";
-import { FaAws } from "react-icons/fa";
 
 type AchievementCategory = "performance" | "devops" | "architecture" | "testing" | "feature";
 type GroupId = "all" | "perf" | "devops" | "sistemas" | "qualidade";
@@ -40,7 +29,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "perf-1",
         metric: "3× capacidade",
         subMetric: "900ms → 350ms de resposta",
-        text: "Reestruturou um sistema backend monolítico para arquitetura de microsserviços com Clean Architecture e DDD, usando Node.js, TypeScript e AWS. O resultado foi ",
+        text: "Reestruturou um sistema backend monolítico para arquitetura de microsserviços com Clean Architecture e DDD, usando Node.js, TypeScript e AWS. O resultado foi",
         highlight: "3× mais requisições simultâneas e latência reduzida de 900ms para 350ms.",
         category: "architecture",
       },
@@ -48,7 +37,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "perf-2",
         metric: "12s → ~2s",
         subMetric: "tempo de carregamento",
-        text: "Desenvolveu módulo de gestão de notas fiscais, ordens de compra e contas a pagar. Otimizou queries SQL e migrou para banco relacional, reduzindo o tempo de carregamento do painel de ",
+        text: "Desenvolveu módulo de gestão de notas fiscais, ordens de compra e contas a pagar. Otimizou queries SQL e migrou para banco relacional, reduzindo o tempo de carregamento do painel de",
         highlight: "12 segundos para menos de 2 segundos.",
         category: "performance",
       },
@@ -62,7 +51,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "devops-1",
         metric: "2h → 12min",
         subMetric: "tempo de publicação",
-        text: "Projetou e implementou pipeline de CI/CD com GitHub Actions, automatizando build, testes e deploy de aplicações Node.js e Next.js. O processo que levava 2 horas passou a ser concluído em ",
+        text: "Projetou e implementou pipeline de CI/CD com GitHub Actions, automatizando build, testes e deploy de aplicações Node.js e Next.js. O processo que levava 2 horas passou a ser concluído em",
         highlight: "12 minutos, sem intervenção manual.",
         category: "devops",
       },
@@ -70,7 +59,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "devops-2",
         metric: "Zero divergências",
         subMetric: "entre ambientes",
-        text: "Containerizou toda a stack backend e frontend com Docker, tornando o ambiente de desenvolvimento idêntico ao de produção e ",
+        text: "Containerizou toda a stack backend e frontend com Docker, tornando o ambiente de desenvolvimento idêntico ao de produção e",
         highlight: "eliminando falhas causadas por diferenças de configuração.",
         category: "devops",
       },
@@ -78,7 +67,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "devops-3",
         metric: "~13h/semana",
         subMetric: "recuperadas pelo time",
-        text: "Automatizou a geração de relatórios financeiros que antes eram feitos manualmente, eliminando erros humanos na consolidação de dados e devolvendo ao time ",
+        text: "Automatizou a geração de relatórios financeiros que antes eram feitos manualmente, eliminando erros humanos na consolidação de dados e devolvendo ao time",
         highlight: "cerca de 13 horas de trabalho por semana.",
         category: "devops",
       },
@@ -92,7 +81,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "api-1",
         metric: "Orçamentos precisos",
         subMetric: "em segundos",
-        text: "Criou módulo completo de estimativa de custos para construção civil integrado à base de dados governamental, com backend em Node.js, TypeScript e PostgreSQL e interface em React. Reduziu o tempo de elaboração de propostas e ",
+        text: "Criou módulo completo de estimativa de custos para construção civil integrado à base de dados governamental, com backend em Node.js, TypeScript e PostgreSQL e interface em React. Reduziu o tempo de elaboração de propostas e",
         highlight: "aumentou significativamente a precisão dos orçamentos.",
         category: "feature",
       },
@@ -100,7 +89,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "api-2",
         metric: "Tempo real",
         subMetric: "sem recarregar a página",
-        text: "Projetou e implementou sistema de notificações em tempo real substituindo polling por WebSockets com Node.js, TypeScript, React e Next.js, garantindo que todos os usuários recebam ",
+        text: "Projetou e implementou sistema de notificações em tempo real substituindo polling por WebSockets com Node.js, TypeScript, React e Next.js, garantindo que todos os usuários recebam",
         highlight: "atualizações instantâneas e sincronizadas.",
         category: "feature",
       },
@@ -108,7 +97,7 @@ const achievementGroups: AchievementGroup[] = [
         id: "api-3",
         metric: "Alta concorrência",
         subMetric: "rastreabilidade total",
-        text: "Arquitetou API de controle de pagamentos com Node.js, TypeScript e MongoDB, projetada para processar ",
+        text: "Arquitetou API de controle de pagamentos com Node.js, TypeScript e MongoDB, projetada para processar",
         highlight: "múltiplas transações simultâneas com rastreabilidade financeira completa.",
         category: "architecture",
       },
@@ -122,33 +111,13 @@ const achievementGroups: AchievementGroup[] = [
         id: "test-1",
         metric: "60% de cobertura",
         subMetric: "testes automatizados",
-        text: "Implementou testes unitários e de integração com Jest e TypeScript, garantindo que falhas sejam detectadas automaticamente antes de qualquer atualização chegar ao usuário final. Alcançou ",
+        text: "Implementou testes unitários e de integração com Jest e TypeScript, garantindo que falhas sejam detectadas automaticamente antes de qualquer atualização chegar ao usuário final. Alcançou",
         highlight: "60% de cobertura de testes e aumentou a confiabilidade do sistema em produção.",
         category: "testing",
       },
     ],
   },
 ];
-
-const techStack = [
-  { name: "Node.js",    icon: SiNodedotjs,   color: "#339933" },
-  { name: "TypeScript", icon: SiTypescript,  color: "#3178C6" },
-  { name: "React",      icon: SiReact,       color: "#61DAFB" },
-  { name: "Next.js",    icon: SiNextdotjs,   color: "#ffffff" },
-  { name: "AWS",        icon: FaAws,         color: "#FF9900" },
-  { name: "Docker",     icon: SiDocker,      color: "#2496ED" },
-  { name: "PostgreSQL", icon: SiPostgresql,  color: "#4169E1" },
-  { name: "MongoDB",    icon: SiMongodb,     color: "#47A248" },
-  { name: "Jest",       icon: SiJest,        color: "#C21325" },
-];
-
-const categoryChipColors: Record<AchievementCategory, string> = {
-  performance: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  devops:      "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  architecture:"bg-purple-500/10 text-purple-400 border-purple-500/20",
-  testing:     "bg-green-500/10 text-green-400 border-green-500/20",
-  feature:     "bg-accent/10 text-accent border-accent/20",
-};
 
 const totalCount = achievementGroups.reduce((s, g) => s + g.achievements.length, 0);
 
@@ -157,37 +126,26 @@ const AchievementCard = ({ achievement, index }: { achievement: Achievement; ind
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.04 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative p-3 rounded-sm cursor-default"
+      className="relative p-4 rounded-sm cursor-default"
       style={{
-        border: hovered ? "1px solid rgba(64,203,246,0.3)" : "1px solid rgba(34,38,41,0.6)",
-        backgroundColor: hovered ? "rgba(16,23,27,0.3)" : "rgba(26,26,26,0.3)",
-        transition: "border-color 0.2s, background-color 0.2s",
+        border: hovered ? "1px solid rgba(64,203,246,0.25)" : "1px solid rgba(34,38,41,0.5)",
+        transition: "border-color 0.2s",
       }}
     >
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div>
-          <p className="font-mono text-xl font-bold text-accent leading-none">
-            {achievement.metric}
-          </p>
-          <p className="font-mono text-[10px] text-text-secondary mt-1">
-            {achievement.subMetric}
-          </p>
-        </div>
-        <span className={`font-mono text-[9px] px-2 py-0.5 rounded-sm border shrink-0 ${categoryChipColors[achievement.category]}`}>
-          {achievement.category}
-        </span>
-      </div>
-
-      <div className="h-px bg-default-border/30 mb-2" />
-
+      <p className="font-mono text-lg font-bold text-accent leading-none">
+        {achievement.metric}
+      </p>
+      <p className="font-mono text-[10px] text-text-secondary mt-1 mb-3">
+        {achievement.subMetric}
+      </p>
       <p className="text-xs text-gray-500 leading-relaxed">
         {achievement.text}{" "}
-        <span className="text-gray-200 font-medium">{achievement.highlight}</span>
+        <span className="text-gray-300">{achievement.highlight}</span>
       </p>
     </motion.div>
   );
@@ -241,8 +199,8 @@ const Experience = () => {
           <motion.div
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="shrink-0 w-40 border-r border-default-border/40 flex flex-col py-2 overflow-hidden"
+            transition={{ duration: 0.4, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+            className="shrink-0 w-36 border-r border-default-border/40 flex flex-col py-2"
           >
             {navItems.map((item) => {
               const isActive = activeGroup === item.id;
@@ -264,44 +222,6 @@ const Experience = () => {
                 </button>
               );
             })}
-
-            <div className="border-t border-default-border/30 mx-4 my-3" />
-
-            <div className="flex flex-col gap-3 px-4">
-              <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">// impacto</p>
-
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-mono text-sm font-bold text-accent leading-none">~13h</span>
-                  <span className="font-mono text-[9px] text-text-secondary">/semana</span>
-                </div>
-                <p className="text-[9px] text-gray-600 leading-snug">devolvidas ao time via automação</p>
-              </div>
-
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-mono text-sm font-bold text-accent leading-none">3×</span>
-                  <span className="font-mono text-[9px] text-text-secondary">mais requisições</span>
-                </div>
-                <p className="text-[9px] text-gray-600 leading-snug">após reescrita da arquitetura</p>
-              </div>
-
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-mono text-sm font-bold text-accent leading-none">−83%</span>
-                  <span className="font-mono text-[9px] text-text-secondary">no tempo</span>
-                </div>
-                <p className="text-[9px] text-gray-600 leading-snug">de carregamento do painel</p>
-              </div>
-
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="font-mono text-sm font-bold text-accent leading-none">10×</span>
-                  <span className="font-mono text-[9px] text-text-secondary">mais rápido</span>
-                </div>
-                <p className="text-[9px] text-gray-600 leading-snug">no ciclo de deploy</p>
-              </div>
-            </div>
           </motion.div>
 
           {/* Achievement area */}
@@ -311,7 +231,7 @@ const Experience = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.18 }}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-2"
             >
               {visibleAchievements.map((achievement, i) => (
                 <AchievementCard key={achievement.id} achievement={achievement} index={i} />
@@ -320,30 +240,6 @@ const Experience = () => {
           </div>
 
         </div>
-
-        {/* Tech stack footer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="shrink-0 border-t border-default-border/40 px-4 py-2.5 flex items-center gap-1 flex-wrap"
-        >
-          <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mr-2">stack</span>
-          {techStack.map((tech) => {
-            const Icon = tech.icon;
-            return (
-              <div
-                key={tech.name}
-                className="flex items-center gap-1.5 px-2 py-1 border border-default-border/50 bg-background rounded-sm transition-colors duration-150 hover:border-accent/30 group"
-              >
-                <Icon size={12} style={{ color: tech.color }} />
-                <span className="font-mono text-[9px] text-gray-500 group-hover:text-gray-300 transition-colors duration-150">
-                  {tech.name}
-                </span>
-              </div>
-            );
-          })}
-        </motion.div>
 
       </div>
     </ContentLayout>
