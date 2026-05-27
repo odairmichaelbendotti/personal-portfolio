@@ -365,8 +365,8 @@ const Projects = () => {
             </div>
           </div>
 
-          {/* Filter tabs */}
-          <div className="flex items-center border-b border-default-border/40">
+          {/* Filter tabs — desktop only */}
+          <div className="hidden md:flex items-center border-b border-default-border/40">
             {categories.map((cat) => {
               const Icon = tabIcons[cat];
               const isActive = activeCategory === cat;

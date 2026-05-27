@@ -15,7 +15,9 @@ export const Resume = () => {
     }
     return "About me";
   });
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">(() =>
+    typeof window !== "undefined" && window.innerWidth < 768 ? "light" : "dark"
+  );
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
