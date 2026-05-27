@@ -1,17 +1,18 @@
-import { useState } from "react";
-import { motion } from "motion/react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { X } from "lucide-react";
 import ContentLayout from "./Layout/ContentLayout";
 
-type AchievementCategory = "performance" | "devops" | "architecture" | "testing" | "feature";
 type GroupId = "all" | "perf" | "devops" | "sistemas" | "qualidade";
 
 type Achievement = {
   id: string;
   metric: string;
-  subMetric: string;
-  text: string;
-  highlight: string;
-  category: AchievementCategory;
+  metricSub: string;
+  description: string;
+  context: string;
+  impact: string[];
+  stack: string[];
 };
 
 type AchievementGroup = {
@@ -27,19 +28,31 @@ const achievementGroups: AchievementGroup[] = [
     achievements: [
       {
         id: "perf-1",
-        metric: "3× capacidade",
-        subMetric: "900ms → 350ms de resposta",
-        text: "Reestruturou um sistema backend monolítico para arquitetura de microsserviços com Clean Architecture e DDD, usando Node.js, TypeScript e AWS. O resultado foi",
-        highlight: "3× mais requisições simultâneas e latência reduzida de 900ms para 350ms.",
-        category: "architecture",
+        metric: "3×",
+        metricSub: "throughput",
+        description: "Migração de monolito para microsserviços com Clean Architecture e DDD — latência de 900ms → 350ms.",
+        context: "O sistema backend enfrentava gargalos críticos de escalabilidade sob carga real. A migração para microsserviços com Clean Architecture e DDD permitiu isolar responsabilidades, escalar serviços individualmente e introduzir filas assíncronas para operações pesadas. A refatoração foi feita de forma incremental, sem downtime.",
+        impact: [
+          "3× mais requisições simultâneas suportadas",
+          "Latência de resposta: 900ms → 350ms",
+          "Downtime zero durante a migração",
+          "Deploys independentes por serviço",
+        ],
+        stack: ["Node.js", "TypeScript", "AWS", "Docker"],
       },
       {
         id: "perf-2",
-        metric: "12s → ~2s",
-        subMetric: "tempo de carregamento",
-        text: "Desenvolveu módulo de gestão de notas fiscais, ordens de compra e contas a pagar. Otimizou queries SQL e migrou para banco relacional, reduzindo o tempo de carregamento do painel de",
-        highlight: "12 segundos para menos de 2 segundos.",
-        category: "performance",
+        metric: "12s → 2s",
+        metricSub: "carregamento",
+        description: "Otimização de queries SQL e migração para banco relacional no módulo financeiro.",
+        context: "O painel financeiro carregava dados via queries não otimizadas em banco NoSQL, causando lentidão crítica para os usuários. A migração para PostgreSQL com índices adequados, views materializadas e paginação server-side reduziu drasticamente o tempo de resposta do painel principal.",
+        impact: [
+          "Tempo de carregamento: 12s → menos de 2s",
+          "Queries otimizadas com índices compostos",
+          "Paginação server-side eliminando over-fetching",
+          "Experiência do usuário significativamente melhorada",
+        ],
+        stack: ["PostgreSQL", "TypeScript", "Node.js"],
       },
     ],
   },
@@ -50,26 +63,44 @@ const achievementGroups: AchievementGroup[] = [
       {
         id: "devops-1",
         metric: "2h → 12min",
-        subMetric: "tempo de publicação",
-        text: "Projetou e implementou pipeline de CI/CD com GitHub Actions, automatizando build, testes e deploy de aplicações Node.js e Next.js. O processo que levava 2 horas passou a ser concluído em",
-        highlight: "12 minutos, sem intervenção manual.",
-        category: "devops",
+        metricSub: "deploy",
+        description: "Pipeline de CI/CD com GitHub Actions — build, testes e deploy automatizados sem intervenção manual.",
+        context: "O processo de publicação era manual, propenso a erros e dependente de um único desenvolvedor. O pipeline implementado com GitHub Actions automatiza build, execução de testes, criação de imagem Docker e deploy em AWS, com rollback automático em caso de falha nos testes.",
+        impact: [
+          "Tempo de publicação: 2h → 12 minutos",
+          "Zero intervenção manual no processo de deploy",
+          "Rollback automático em falhas de teste",
+          "Histórico completo de deploys auditável",
+        ],
+        stack: ["GitHub Actions", "Node.js", "Next.js", "Docker", "AWS"],
       },
       {
         id: "devops-2",
-        metric: "Zero divergências",
-        subMetric: "entre ambientes",
-        text: "Containerizou toda a stack backend e frontend com Docker, tornando o ambiente de desenvolvimento idêntico ao de produção e",
-        highlight: "eliminando falhas causadas por diferenças de configuração.",
-        category: "devops",
+        metric: "Zero",
+        metricSub: "divergências",
+        description: "Stack containerizada com Docker — ambiente de dev idêntico ao de produção.",
+        context: "Falhas recorrentes em produção eram causadas por diferenças entre ambientes de desenvolvimento e produção. A containerização completa da stack com Docker Compose para desenvolvimento e imagens otimizadas para produção eliminou essa classe de problema, além de simplificar o onboarding de novos desenvolvedores.",
+        impact: [
+          "Ambientes de dev e produção 100% idênticos",
+          "Onboarding de novos devs: setup em minutos",
+          "Eliminação de bugs exclusivos de produção por config",
+          "Portabilidade total da stack",
+        ],
+        stack: ["Docker", "Docker Compose", "Node.js"],
       },
       {
         id: "devops-3",
-        metric: "~13h/semana",
-        subMetric: "recuperadas pelo time",
-        text: "Automatizou a geração de relatórios financeiros que antes eram feitos manualmente, eliminando erros humanos na consolidação de dados e devolvendo ao time",
-        highlight: "cerca de 13 horas de trabalho por semana.",
-        category: "devops",
+        metric: "~13h",
+        metricSub: "por semana",
+        description: "Automação de relatórios financeiros antes feitos manualmente — erros eliminados.",
+        context: "A equipe financeira gastava mais de 13 horas semanais consolidando dados manualmente em planilhas, com alto risco de erros humanos. O sistema automatizado coleta, processa e gera relatórios em PDF/Excel com agendamento configurável, notificando os responsáveis por e-mail ao concluir.",
+        impact: [
+          "~13 horas semanais devolvidas à equipe",
+          "Erros de consolidação manual eliminados",
+          "Relatórios gerados com agendamento automático",
+          "Notificação por e-mail ao concluir geração",
+        ],
+        stack: ["Node.js", "TypeScript", "PostgreSQL"],
       },
     ],
   },
@@ -79,27 +110,45 @@ const achievementGroups: AchievementGroup[] = [
     achievements: [
       {
         id: "api-1",
-        metric: "Orçamentos precisos",
-        subMetric: "em segundos",
-        text: "Criou módulo completo de estimativa de custos para construção civil integrado à base de dados governamental, com backend em Node.js, TypeScript e PostgreSQL e interface em React. Reduziu o tempo de elaboração de propostas e",
-        highlight: "aumentou significativamente a precisão dos orçamentos.",
-        category: "feature",
+        metric: "Segundos",
+        metricSub: "vs. horas",
+        description: "Módulo de estimativa de custos para construção civil integrado à base de dados governamental.",
+        context: "Orçamentos de construção civil eram elaborados manualmente com tabelas desatualizadas, levando horas e gerando propostas imprecisas. O módulo integra-se à base de dados SINAPI (governo federal) para busca de insumos e composições, calcula automaticamente BDI e aplica regionalizações, entregando estimativas precisas em segundos.",
+        impact: [
+          "Tempo de elaboração: horas → segundos",
+          "Integração com base SINAPI atualizada",
+          "Cálculo automático de BDI e regionalização",
+          "Aumento significativo na precisão dos orçamentos",
+        ],
+        stack: ["Node.js", "TypeScript", "PostgreSQL", "React"],
       },
       {
         id: "api-2",
         metric: "Tempo real",
-        subMetric: "sem recarregar a página",
-        text: "Projetou e implementou sistema de notificações em tempo real substituindo polling por WebSockets com Node.js, TypeScript, React e Next.js, garantindo que todos os usuários recebam",
-        highlight: "atualizações instantâneas e sincronizadas.",
-        category: "feature",
+        metricSub: "sem polling",
+        description: "Sistema de notificações via WebSockets substituindo polling — atualizações instantâneas.",
+        context: "O sistema anterior usava polling a cada 30 segundos para verificar novas notificações, causando carga desnecessária no servidor e atraso nas atualizações. A migração para WebSockets com Node.js garante que todos os usuários conectados recebam atualizações instantâneas e sincronizadas, com reconexão automática em caso de queda.",
+        impact: [
+          "Latência de notificação: 30s → instantânea",
+          "Carga de servidor reduzida com eliminação do polling",
+          "Reconexão automática com backoff exponencial",
+          "Suporte a múltiplas abas/sessões simultâneas",
+        ],
+        stack: ["WebSockets", "Node.js", "TypeScript", "React", "Next.js"],
       },
       {
         id: "api-3",
-        metric: "Alta concorrência",
-        subMetric: "rastreabilidade total",
-        text: "Arquitetou API de controle de pagamentos com Node.js, TypeScript e MongoDB, projetada para processar",
-        highlight: "múltiplas transações simultâneas com rastreabilidade financeira completa.",
-        category: "architecture",
+        metric: "Alta",
+        metricSub: "concorrência",
+        description: "API de controle de pagamentos com rastreabilidade financeira completa.",
+        context: "A API de pagamentos precisava suportar múltiplas transações simultâneas com garantia de consistência e rastreabilidade total. A arquitetura usa padrão de eventos para auditoria, transações idempotentes para evitar duplicidade e índices otimizados no MongoDB para consultas de extrato em alta velocidade.",
+        impact: [
+          "Suporte a múltiplas transações simultâneas",
+          "Rastreabilidade financeira completa via event log",
+          "Idempotência garantida — sem duplicidade de cobranças",
+          "Consultas de extrato em < 100ms",
+        ],
+        stack: ["Node.js", "TypeScript", "MongoDB"],
       },
     ],
   },
@@ -109,11 +158,17 @@ const achievementGroups: AchievementGroup[] = [
     achievements: [
       {
         id: "test-1",
-        metric: "60% de cobertura",
-        subMetric: "testes automatizados",
-        text: "Implementou testes unitários e de integração com Jest e TypeScript, garantindo que falhas sejam detectadas automaticamente antes de qualquer atualização chegar ao usuário final. Alcançou",
-        highlight: "60% de cobertura de testes e aumentou a confiabilidade do sistema em produção.",
-        category: "testing",
+        metric: "60%",
+        metricSub: "cobertura",
+        description: "Testes unitários e de integração com Jest — falhas detectadas antes de chegar ao usuário.",
+        context: "O projeto não tinha cultura de testes estabelecida, resultando em regressões frequentes em produção. A implementação de testes unitários para regras de negócio críticas e testes de integração para os principais fluxos de API, combinada com a execução automática no pipeline de CI, criou uma rede de segurança que detecta problemas antes do deploy.",
+        impact: [
+          "60% de cobertura de testes automatizados",
+          "Regressões detectadas automaticamente no CI",
+          "Confiabilidade aumentada em produção",
+          "Refatorações seguras com cobertura garantida",
+        ],
+        stack: ["Jest", "TypeScript", "Node.js"],
       },
     ],
   },
@@ -121,7 +176,130 @@ const achievementGroups: AchievementGroup[] = [
 
 const totalCount = achievementGroups.reduce((s, g) => s + g.achievements.length, 0);
 
-const AchievementCard = ({ achievement, index }: { achievement: Achievement; index: number }) => {
+const DetailModal = ({ achievement, onClose }: { achievement: Achievement; onClose: () => void }) => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ backgroundColor: "rgba(3,5,7,0.75)", backdropFilter: "blur(2px)" }}
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative w-full max-w-lg max-h-[80vh] overflow-y-auto scrollbar-hide flex flex-col rounded-sm"
+          style={{
+            backgroundColor: "var(--color-card-background)",
+            border: "1px solid var(--color-default-border)",
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Modal header */}
+          <div
+            className="shrink-0 flex items-start justify-between px-5 pt-5 pb-4"
+            style={{ borderBottom: "1px solid var(--color-default-border)" }}
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="font-mono text-2xl font-bold text-accent leading-none">
+                {achievement.metric}
+              </span>
+              <span className="font-mono text-[10px] text-text-secondary/60 uppercase tracking-widest">
+                {achievement.metricSub}
+              </span>
+            </div>
+            <button
+              onClick={onClose}
+              className="flex items-center justify-center w-7 h-7 rounded-sm cursor-pointer transition-colors duration-150"
+              style={{ color: "var(--color-text-muted)", border: "1px solid var(--color-default-border)" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.color = "var(--color-accent)";
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.color = "var(--color-text-muted)";
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--color-default-border)";
+              }}
+            >
+              <X size={13} />
+            </button>
+          </div>
+
+          {/* Modal body */}
+          <div className="flex flex-col gap-5 px-5 py-5">
+
+            {/* Context */}
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">// contexto</span>
+              <p className="text-xs text-text-secondary leading-relaxed">{achievement.context}</p>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-default-border/40" />
+
+            {/* Impact */}
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">// impacto</span>
+              <ul className="flex flex-col gap-1.5">
+                {achievement.impact.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="font-mono text-[10px] text-accent/50 shrink-0 mt-0.5">→</span>
+                    <span className="text-xs text-text-code leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-default-border/40" />
+
+            {/* Stack */}
+            <div className="flex flex-col gap-2">
+              <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">// stack</span>
+              <div className="flex flex-wrap gap-1.5">
+                {achievement.stack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="font-mono text-[10px] px-2 py-1 rounded-sm"
+                    style={{
+                      backgroundColor: "var(--color-accent-third)",
+                      color: "var(--color-text-secondary)",
+                      border: "1px solid var(--color-default-border)",
+                    }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const AchievementCard = ({
+  achievement,
+  index,
+  onClick,
+}: {
+  achievement: Achievement;
+  index: number;
+  onClick: () => void;
+}) => {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -131,28 +309,68 @@ const AchievementCard = ({ achievement, index }: { achievement: Achievement; ind
       transition={{ duration: 0.2, delay: index * 0.04 }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative p-4 rounded-sm cursor-default"
+      onClick={onClick}
+      className="flex gap-4 px-4 py-3 rounded-sm cursor-pointer"
       style={{
-        border: hovered ? "1px solid rgba(64,203,246,0.25)" : "1px solid var(--color-default-border)",
-        transition: "border-color 0.2s",
+        border: hovered ? "1px solid rgba(64,203,246,0.22)" : "1px solid var(--color-default-border)",
+        backgroundColor: hovered ? "rgba(64,203,246,0.02)" : "transparent",
+        transition: "border-color 0.2s, background-color 0.2s",
       }}
     >
-      <p className="font-mono text-lg font-bold text-accent leading-none">
-        {achievement.metric}
-      </p>
-      <p className="font-mono text-[10px] text-text-secondary mt-1 mb-3">
-        {achievement.subMetric}
-      </p>
-      <p className="text-xs text-text-muted leading-relaxed">
-        {achievement.text}{" "}
-        <span className="text-text-code">{achievement.highlight}</span>
-      </p>
+      {/* Metric column */}
+      <div className="shrink-0 w-20 flex flex-col justify-center">
+        <span className="font-mono text-base font-bold text-accent leading-none">
+          {achievement.metric}
+        </span>
+        <span className="font-mono text-[9px] text-text-secondary/60 mt-0.5 uppercase tracking-wider">
+          {achievement.metricSub}
+        </span>
+      </div>
+
+      {/* Divider */}
+      <div
+        className="shrink-0 w-px self-stretch"
+        style={{ backgroundColor: hovered ? "rgba(64,203,246,0.2)" : "var(--color-default-border)" }}
+      />
+
+      {/* Content */}
+      <div className="flex flex-col justify-center gap-1.5 min-w-0 flex-1">
+        <p className="text-xs text-text-secondary leading-relaxed">
+          {achievement.description}
+        </p>
+        <div className="flex flex-wrap gap-1">
+          {achievement.stack.map((tech) => (
+            <span
+              key={tech}
+              className="font-mono text-[9px] px-1.5 py-0.5 rounded-sm"
+              style={{
+                backgroundColor: "var(--color-accent-third)",
+                color: "var(--color-text-muted)",
+                border: "1px solid var(--color-default-border)",
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Click hint */}
+      <div className="shrink-0 flex items-center self-center">
+        <span
+          className="font-mono text-[9px] transition-colors duration-150"
+          style={{ color: hovered ? "var(--color-accent)" : "var(--color-text-muted)" }}
+        >
+          ver →
+        </span>
+      </div>
     </motion.div>
   );
 };
 
 const Experience = () => {
   const [activeGroup, setActiveGroup] = useState<GroupId>("all");
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
 
   const visibleAchievements =
     activeGroup === "all"
@@ -213,25 +431,28 @@ const Experience = () => {
           })}
         </div>
 
-        {/* Mobile: achievement area full width */}
+        {/* Mobile: achievement area */}
         <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide p-4 pb-24">
           <motion.div
             key={activeGroup + "-mobile"}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.18 }}
-            className="flex flex-col gap-3"
+            className="flex flex-col gap-2"
           >
             {visibleAchievements.map((achievement, i) => (
-              <AchievementCard key={achievement.id} achievement={achievement} index={i} />
+              <AchievementCard
+                key={achievement.id}
+                achievement={achievement}
+                index={i}
+                onClick={() => setSelectedAchievement(achievement)}
+              />
             ))}
           </motion.div>
         </div>
 
-        {/* Body: nav + content — desktop only */}
+        {/* Desktop: nav lateral + content */}
         <div className="hidden md:flex flex-1 min-h-0">
-
-          {/* Nav lateral */}
           <motion.div
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
@@ -260,7 +481,6 @@ const Experience = () => {
             })}
           </motion.div>
 
-          {/* Achievement area */}
           <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
             <motion.div
               key={activeGroup}
@@ -270,14 +490,29 @@ const Experience = () => {
               className="flex flex-col gap-2"
             >
               {visibleAchievements.map((achievement, i) => (
-                <AchievementCard key={achievement.id} achievement={achievement} index={i} />
+                <AchievementCard
+                  key={achievement.id}
+                  achievement={achievement}
+                  index={i}
+                  onClick={() => setSelectedAchievement(achievement)}
+                />
               ))}
             </motion.div>
           </div>
-
         </div>
 
       </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {selectedAchievement && (
+          <DetailModal
+            achievement={selectedAchievement}
+            onClose={() => setSelectedAchievement(null)}
+          />
+        )}
+      </AnimatePresence>
+
     </ContentLayout>
   );
 };
