@@ -60,7 +60,7 @@ const Contact = () => {
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg pb-20 md:pb-0">
 
-        {/* Header slim */}
+        {/* Header slim — shared */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
@@ -81,8 +81,139 @@ const Contact = () => {
           <div className="mt-3 h-px bg-linear-to-r from-accent/30 via-default-border to-transparent" />
         </motion.div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-5">
+        {/* ── MOBILE BODY ─────────────────────────────────────────── */}
+        <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide px-4 py-5 flex flex-col gap-4">
+
+          <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">
+            // contato direto
+          </p>
+
+          {/* Email card */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: 0.08 }}
+            className="rounded-sm border p-4 flex flex-col gap-3"
+            style={{ borderColor: "var(--color-default-border)", backgroundColor: "var(--color-background)" }}
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">mailto://</span>
+              <span className="font-mono text-sm font-medium text-text-primary">{directContact.email}</span>
+            </div>
+            <div className="flex gap-2 border-t pt-3" style={{ borderColor: "var(--color-default-border)" }}>
+              <button
+                onClick={() => handleCopy(directContact.email, "email")}
+                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
+                style={{
+                  borderColor: isCopied("email") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
+                  color: isCopied("email") ? "var(--color-success)" : "var(--color-text-secondary)",
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  {isCopied("email") ? (
+                    <motion.span key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                      <Check size={12} />
+                    </motion.span>
+                  ) : (
+                    <motion.span key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                      <Copy size={12} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                {isCopied("email") ? "copiado" : "copiar"}
+              </button>
+              <a
+                href={`mailto:${directContact.email}`}
+                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
+                style={{ borderColor: "var(--color-default-border)", color: "var(--color-text-secondary)" }}
+              >
+                <SiGmail size={12} />
+                enviar →
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Phone card */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: 0.16 }}
+            className="rounded-sm border p-4 flex flex-col gap-3"
+            style={{ borderColor: "var(--color-default-border)", backgroundColor: "var(--color-background)" }}
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">wa.me//</span>
+              <span className="font-mono text-sm font-medium text-text-primary">{directContact.phone}</span>
+            </div>
+            <div className="flex gap-2 border-t pt-3" style={{ borderColor: "var(--color-default-border)" }}>
+              <button
+                onClick={() => handleCopy(directContact.phone, "phone")}
+                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
+                style={{
+                  borderColor: isCopied("phone") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
+                  color: isCopied("phone") ? "var(--color-success)" : "var(--color-text-secondary)",
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  {isCopied("phone") ? (
+                    <motion.span key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                      <Check size={12} />
+                    </motion.span>
+                  ) : (
+                    <motion.span key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                      <Copy size={12} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+                {isCopied("phone") ? "copiado" : "copiar"}
+              </button>
+              <a
+                href={`https://wa.me/${directContact.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
+                style={{ borderColor: "var(--color-default-border)", color: "var(--color-text-secondary)" }}
+              >
+                <SiWhatsapp size={12} />
+                abrir chat →
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Sociais divider */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-default-border/30" />
+            <span className="font-mono text-[9px] text-accent/30 uppercase tracking-widest">sociais</span>
+            <div className="h-px flex-1 bg-default-border/30" />
+          </div>
+
+          {/* Social grid 3 cols */}
+          <div className="grid grid-cols-3 gap-3">
+            {socialLinks.map((link, index) => {
+              const Icon = link.icon;
+              return (
+                <motion.a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: 0.3 + index * 0.06 }}
+                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-sm border cursor-pointer"
+                  style={{ borderColor: "var(--color-default-border)", backgroundColor: "var(--color-background)" }}
+                >
+                  <Icon size={22} style={{ color: link.color }} />
+                  <span className="font-mono text-[10px] text-text-secondary">{link.name}</span>
+                </motion.a>
+              );
+            })}
+          </div>
+
+        </div>
+
+        {/* ── DESKTOP BODY ────────────────────────────────────────── */}
+        <div className="hidden md:block flex-1 overflow-y-auto scrollbar-hide px-4 py-5">
 
           <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-5">
             // presence log
@@ -222,7 +353,7 @@ const Contact = () => {
 
         </div>
 
-        {/* Footer */}
+        {/* Footer — shared */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
