@@ -468,23 +468,24 @@ const Projects = () => {
           {/* Mobile list */}
           <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide pb-24">
             {/* Mobile category filters */}
-            <div className="flex overflow-x-auto scrollbar-hide gap-2 px-4 py-3 border-b border-default-border/30">
+            <div className="flex overflow-x-auto scrollbar-hide border-b border-default-border/40 px-4 gap-1">
               {categories.map((cat) => {
                 const Icon = tabIcons[cat];
                 const isActive = activeCategory === cat;
+                const count = cat === "All" ? projects.length : projects.filter((p) => p.category === cat).length;
                 return (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[10px] shrink-0 cursor-pointer transition-colors duration-150"
+                    className="relative flex items-center gap-1.5 px-3 py-2.5 text-xs cursor-pointer shrink-0 border-b-2 transition-colors duration-150"
                     style={{
-                      backgroundColor: isActive ? "var(--color-accent)" : "var(--color-background)",
-                      color: isActive ? "var(--color-card-background)" : "var(--color-text-secondary)",
-                      border: isActive ? "1px solid var(--color-accent)" : "1px solid var(--color-default-border)",
+                      borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
+                      color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
                     }}
                   >
-                    <Icon size={11} />
+                    <Icon size={12} />
                     <span>{cat}</span>
+                    <span className="font-mono text-[10px] opacity-50">{count}</span>
                   </button>
                 );
               })}
