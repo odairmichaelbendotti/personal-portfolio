@@ -386,12 +386,38 @@ const Experience = () => {
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg">
 
-        {/* Header slim */}
+        {/* Mobile header — System Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="shrink-0 md:hidden"
+        >
+          <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="font-mono text-[10px] text-accent/40 tracking-widest">§03</span>
+              <span className="text-base font-bold text-text-primary tracking-tight">Experience</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="font-mono text-sm font-bold text-accent">6+</span>
+              <span className="font-mono text-[10px] text-text-secondary ml-1">anos</span>
+            </div>
+          </div>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="h-0.5 origin-left"
+            style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
+          />
+        </motion.div>
+
+        {/* Desktop header slim */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-          className="shrink-0 px-4 py-3"
+          className="shrink-0 hidden md:block px-4 py-3"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-wrap">

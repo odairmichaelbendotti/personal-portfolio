@@ -189,39 +189,49 @@ const ProjectDetail = ({ project }: { project: Project }) => (
       </div>
     )}
 
-    <div className="h-0.5 w-12 mb-4 rounded-full" style={{ backgroundColor: project.color }} />
+    <div className="h-0.5 w-12 mb-3 rounded-full" style={{ backgroundColor: project.color }} />
 
     <h2 className="text-xl font-bold text-text-primary mb-1">{project.title}</h2>
 
-    <div className="flex items-center flex-wrap gap-2 mb-4 text-xs">
+    <div className="flex items-center gap-2 mb-4">
       <span className={`font-mono text-[9px] px-2 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
         {project.category}
       </span>
-      <span className="font-mono text-[10px] text-text-secondary">{project.year}</span>
-      <span className="text-text-secondary">·</span>
-      {project.github && (
-        <a
-          href={project.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-text-secondary hover:text-accent transition-colors"
-        >
-          <GitHubIcon className="w-3.5 h-3.5" />
-          <span>Code</span>
-        </a>
-      )}
-      {project.demo && (
-        <a
-          href={project.demo}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1 text-text-secondary hover:text-accent transition-colors"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          <span>Demo</span>
-        </a>
-      )}
+      <span className="font-mono text-[10px] text-text-muted">{project.year}</span>
     </div>
+
+    {/* Action bar */}
+    {(project.github || project.demo) && (
+      <div className="flex items-center gap-2 mb-4">
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 border border-default-border/60 rounded-sm font-mono text-[10px] text-text-secondary hover:border-accent/40 hover:text-accent transition-colors"
+          >
+            <GitHubIcon className="w-3 h-3" />
+            <span>GitHub</span>
+          </a>
+        )}
+        {project.demo && (
+          <a
+            href={project.demo}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[10px] font-semibold transition-opacity hover:opacity-80"
+            style={{
+              backgroundColor: project.color + "22",
+              border: `1px solid ${project.color}55`,
+              color: project.color,
+            }}
+          >
+            <ExternalLink size={11} />
+            <span>Demo</span>
+          </a>
+        )}
+      </div>
+    )}
 
     <div className="h-px bg-default-border/30 mb-4" />
 
@@ -346,12 +356,38 @@ const Projects = () => {
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg">
 
-        {/* Header */}
+        {/* Mobile header — System Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="shrink-0 md:hidden"
+        >
+          <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="font-mono text-[10px] text-accent/40 tracking-widest">§04</span>
+              <span className="text-base font-bold text-text-primary tracking-tight">Projects</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="font-mono text-sm font-bold text-accent">{projects.length}</span>
+              <span className="font-mono text-[10px] text-text-secondary ml-1">projetos</span>
+            </div>
+          </div>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="h-0.5 origin-left"
+            style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
+          />
+        </motion.div>
+
+        {/* Desktop header */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-          className="shrink-0 px-4 pt-3 pb-0"
+          className="shrink-0 hidden md:block px-4 pt-3 pb-0"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -366,7 +402,7 @@ const Projects = () => {
           </div>
 
           {/* Filter tabs — desktop only */}
-          <div className="hidden md:flex items-center border-b border-default-border/40">
+          <div className="flex items-center border-b border-default-border/40">
             {categories.map((cat) => {
               const Icon = tabIcons[cat];
               const isActive = activeCategory === cat;

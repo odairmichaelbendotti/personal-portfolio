@@ -397,15 +397,31 @@ const Skills = () => {
 
         {/* Mobile View */}
         <div className="md:hidden flex flex-col h-full overflow-hidden">
-          {/* Mobile header slim */}
-          <div className="shrink-0 px-4 py-3 border-b border-default-border/40">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs text-accent">Skills</span>
-              <span className="font-mono text-[10px] text-text-secondary">
-                <span className="text-accent font-bold">{skillList.length}</span> tecnologias
-              </span>
+          {/* Mobile header — System Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="shrink-0"
+          >
+            <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
+              <div className="flex items-center gap-2.5">
+                <span className="font-mono text-[10px] text-accent/40 tracking-widest">§02</span>
+                <span className="text-base font-bold text-text-primary tracking-tight">Skills</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-mono text-sm font-bold text-accent">{skillList.length}</span>
+                <span className="font-mono text-[10px] text-text-secondary ml-1">tecnologias</span>
+              </div>
             </div>
-          </div>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+              className="h-0.5 origin-left"
+              style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
+            />
+          </motion.div>
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 pb-24 scrollbar-hide">
             {(Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]).map((category) => (
               <MobileCategoryCard
