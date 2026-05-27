@@ -164,9 +164,9 @@ const FeaturedSkillCard = ({ skill, index }: { skill: Skill; index: number }) =>
       className="relative w-24 h-24 flex flex-col items-center justify-center gap-2 rounded-sm cursor-pointer shrink-0"
       style={{
         border: isHovered
-          ? "1px solid rgba(64,203,246,0.6)"
-          : "1px solid rgba(64,203,246,0.2)",
-        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-background)",
+          ? "1px solid rgba(64,203,246,0.70)"
+          : "1px solid rgba(64,203,246,0.12)",
+        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-card-background)",
         transition: "border-color 0.25s, background-color 0.25s",
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -210,9 +210,9 @@ const SecondarySkillCard = ({ skill, index }: { skill: Skill; index: number }) =
       className="relative flex flex-col items-center justify-center gap-1.5 rounded-sm cursor-pointer"
       style={{
         border: isHovered
-          ? "1px solid rgba(64,203,246,0.4)"
-          : "1px solid var(--color-default-border)",
-        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-background)",
+          ? "1px solid rgba(64,203,246,0.35)"
+          : "1px solid rgba(30,37,44,0.9)",
+        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-card-background)",
         transition: "border-color 0.25s, background-color 0.25s",
         aspectRatio: "1",
       }}

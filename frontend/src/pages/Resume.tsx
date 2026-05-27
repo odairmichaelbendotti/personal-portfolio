@@ -9,15 +9,12 @@ import Contact from "../components/Content/Contact";
 
 export const Resume = () => {
   const [view, setView] = useState<string>(() => {
-    // Initialize based on current window width
     if (typeof window !== "undefined") {
       return window.innerWidth < 768 ? "About" : "About me";
     }
     return "About me";
   });
-  const [theme, setTheme] = useState<"light" | "dark">(() =>
-    typeof window !== "undefined" && window.innerWidth < 768 ? "light" : "dark"
-  );
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
@@ -46,22 +43,11 @@ export const Resume = () => {
     <div className="relative min-h-dvh h-dvh md:min-h-screen md:h-screen w-full flex md:flex-row justify-center items-center">
       <>
         {isMobile ? (
-          <MobileMenu
-            setView={setView}
-            view={view}
-            theme={theme}
-            setTheme={setTheme}
-          />
+          <MobileMenu setView={setView} view={view} />
         ) : (
-          <Sidebar
-            setView={setView}
-            view={view}
-            theme={theme}
-            setTheme={setTheme}
-          />
+          <Sidebar setView={setView} view={view} theme={theme} setTheme={setTheme} />
         )}
       </>
-
       <main className="h-full md:h-auto w-full md:w-200">
         {(view === "About me" || view === "About") && <About />}
         {view === "Skills" && <Skills />}
