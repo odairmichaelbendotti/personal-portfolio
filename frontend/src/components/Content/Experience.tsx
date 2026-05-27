@@ -2,6 +2,28 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import ContentLayout from "./Layout/ContentLayout";
+import {
+  SiNodedotjs, SiTypescript, SiDocker, SiPostgresql,
+  SiMongodb, SiGithubactions, SiReact, SiNextdotjs,
+  SiSocketdotio,
+} from "react-icons/si";
+import { FaAws } from "react-icons/fa";
+import { SiJest } from "react-icons/si";
+
+const techIconMap: Record<string, { icon: React.ElementType; color: string }> = {
+  "Node.js":        { icon: SiNodedotjs,      color: "#339933" },
+  "TypeScript":     { icon: SiTypescript,     color: "#3178C6" },
+  "AWS":            { icon: FaAws,            color: "#FF9900" },
+  "Docker":         { icon: SiDocker,         color: "#2496ED" },
+  "Docker Compose": { icon: SiDocker,         color: "#2496ED" },
+  "PostgreSQL":     { icon: SiPostgresql,     color: "#4169E1" },
+  "MongoDB":        { icon: SiMongodb,        color: "#47A248" },
+  "GitHub Actions": { icon: SiGithubactions,  color: "#2088FF" },
+  "React":          { icon: SiReact,          color: "#61DAFB" },
+  "Next.js":        { icon: SiNextdotjs,      color: "#ffffff" },
+  "WebSockets":     { icon: SiSocketdotio,    color: "#ffffff" },
+  "Jest":           { icon: SiJest,           color: "#C21325" },
+};
 
 type GroupId = "all" | "perf" | "devops" | "sistemas" | "qualidade";
 
@@ -268,19 +290,24 @@ const DetailModal = ({ achievement, onClose }: { achievement: Achievement; onClo
             <div className="flex flex-col gap-2">
               <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">// stack</span>
               <div className="flex flex-wrap gap-1.5">
-                {achievement.stack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="font-mono text-[10px] px-2 py-1 rounded-sm"
-                    style={{
-                      backgroundColor: "var(--color-accent-third)",
-                      color: "var(--color-text-secondary)",
-                      border: "1px solid var(--color-default-border)",
-                    }}
-                  >
-                    {tech}
-                  </span>
-                ))}
+                {achievement.stack.map((tech) => {
+                  const entry = techIconMap[tech];
+                  const Icon = entry?.icon;
+                  return (
+                    <span
+                      key={tech}
+                      className="flex items-center gap-1.5 font-mono text-[10px] px-2 py-1 rounded-sm"
+                      style={{
+                        backgroundColor: "var(--color-accent-third)",
+                        color: "var(--color-text-secondary)",
+                        border: "1px solid var(--color-default-border)",
+                      }}
+                    >
+                      {Icon && <Icon size={12} style={{ color: entry.color }} />}
+                      {tech}
+                    </span>
+                  );
+                })}
               </div>
             </div>
 
@@ -339,19 +366,24 @@ const AchievementCard = ({
           {achievement.description}
         </p>
         <div className="flex flex-wrap gap-1">
-          {achievement.stack.map((tech) => (
-            <span
-              key={tech}
-              className="font-mono text-[9px] px-1.5 py-0.5 rounded-sm"
-              style={{
-                backgroundColor: "var(--color-accent-third)",
-                color: "var(--color-text-muted)",
-                border: "1px solid var(--color-default-border)",
-              }}
-            >
-              {tech}
-            </span>
-          ))}
+          {achievement.stack.map((tech) => {
+            const entry = techIconMap[tech];
+            const Icon = entry?.icon;
+            return (
+              <span
+                key={tech}
+                className="flex items-center gap-1 font-mono text-[9px] px-1.5 py-0.5 rounded-sm"
+                style={{
+                  backgroundColor: "var(--color-accent-third)",
+                  color: "var(--color-text-muted)",
+                  border: "1px solid var(--color-default-border)",
+                }}
+              >
+                {Icon && <Icon size={10} style={{ color: entry.color }} />}
+                {tech}
+              </span>
+            );
+          })}
         </div>
       </div>
 
