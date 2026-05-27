@@ -259,7 +259,6 @@ const MobileCategoryCard = ({
   const Icon = config.icon;
   const featured = skills.filter((s) => s.featured);
   const secondary = skills.filter((s) => !s.featured);
-  const sorted = [...featured, ...secondary];
 
   return (
     <motion.div
