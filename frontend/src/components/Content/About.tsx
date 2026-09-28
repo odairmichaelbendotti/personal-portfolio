@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import ContentLayout from "./Layout/ContentLayout";
+import MobileSectionHeader from "./Layout/MobileSectionHeader";
 import { motion, AnimatePresence } from "motion/react";
+import { DURATION, EASE, WordReveal } from "../motion";
 
 const chatData = {
   greeting: "Olá! Sou Odair, desenvolvedor full stack com 6+ anos de experiência criando soluções digitais excepcionais.",
@@ -44,6 +46,8 @@ type TranscriptEntry = {
   answer: string;
 };
 
+const TYPING_DELAY_MS = 750;
+
 const QuestionPill = ({
   question,
   index,
@@ -55,30 +59,30 @@ const QuestionPill = ({
   onSelect: () => void;
   disabled: boolean;
 }) => {
-  const [hovered, setHovered] = useState(false);
   const num = String(question.id).padStart(2, "0");
 
   return (
     <motion.button
+      layout
+      type="button"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8, x: -10 }}
-      transition={{ duration: 0.2, delay: index * 0.06 }}
+      transition={{
+        duration: DURATION.fast,
+        ease: EASE,
+        delay: index * 0.06,
+        layout: { duration: DURATION.base, ease: EASE },
+      }}
       onClick={onSelect}
       disabled={disabled}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`flex items-center gap-1.5 px-3 py-1.5 border rounded-sm font-mono text-[10px] transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-        hovered
-          ? "border-accent/50 bg-accent/5 text-accent"
-          : "border-default-border bg-background text-text-code"
-      }`}
+      className="group flex items-center gap-1.5 px-3 py-1.5 border rounded-sm font-mono text-[10px] transition-colors duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed border-default-border bg-background light:bg-card-background text-text-code hover:border-accent/50 hover:bg-accent/5 hover:text-accent"
     >
       <span className="relative inline-block w-4 shrink-0">
-        <span className={`absolute inset-0 flex items-center justify-center transition-all duration-150 ${hovered ? "opacity-100" : "opacity-0"} text-accent`}>
+        <span className="absolute inset-0 flex items-center justify-center text-accent opacity-0 -translate-x-1 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0">
           →
         </span>
-        <span className={`flex items-center justify-center transition-all duration-150 ${hovered ? "opacity-0" : "opacity-100"} text-accent/60`}>
+        <span className="flex items-center justify-center text-accent/60 transition-opacity duration-150 group-hover:opacity-0">
           {num}
         </span>
       </span>
@@ -92,26 +96,38 @@ const About = () => {
   const [availableQuestions, setAvailableQuestions] = useState(chatData.questions);
   const [isTyping, setIsTyping] = useState(false);
   const [pillKey, setPillKey] = useState(0);
-  const transcriptEndRef = useRef<HTMLDivElement>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null);
+  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Rola só o contêiner do transcript — scrollIntoView arrastava a página inteira no mobile
   useEffect(() => {
-    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = transcriptRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [transcript, isTyping]);
+
+  useEffect(() => () => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+  }, []);
 
   const handleSelect = (question: (typeof chatData.questions)[0]) => {
     setIsTyping(true);
     setAvailableQuestions((prev) => prev.filter((q) => q.id !== question.id));
 
-    setTimeout(() => {
+    typingTimer.current = setTimeout(() => {
+      typingTimer.current = null;
       setTranscript((prev) => [
         ...prev,
         { id: question.id, question: question.question, answer: question.answer },
       ]);
       setIsTyping(false);
-    }, 750);
+    }, TYPING_DELAY_MS);
   };
 
   const handleReset = () => {
+    if (typingTimer.current) {
+      clearTimeout(typingTimer.current);
+      typingTimer.current = null;
+    }
     setTranscript([]);
     setIsTyping(false);
     setPillKey((k) => k + 1);
@@ -124,43 +140,32 @@ const About = () => {
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg pb-20 md:pb-0">
 
-        {/* Mobile header — System Panel */}
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="shrink-0 md:hidden"
-        >
-          <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="font-mono text-[10px] text-accent/40 tracking-widest">§01</span>
-              <span className="text-base font-bold text-text-primary tracking-tight">About</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="font-mono text-sm font-bold text-accent">{answeredCount}/5</span>
+        <MobileSectionHeader
+          index="01"
+          title="About"
+          aside={
+            <>
+              <span className="font-mono text-sm font-bold text-accent tabular-nums">{answeredCount}/5</span>
               <span className="font-mono text-[10px] text-text-secondary ml-1">respondidas</span>
-            </div>
-          </div>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="h-0.5 origin-left"
-            style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
-          />
-        </motion.div>
+            </>
+          }
+        />
 
         {/* Greeting + pills */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: DURATION.base, ease: EASE }}
           className="shrink-0 px-4 sm:px-6 pt-5 pb-4 flex flex-col gap-4"
         >
           {/* Greeting message */}
           <div className="border-l-2 border-accent bg-accent/10 px-3 py-2 rounded-sm">
             <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
-            <span className="text-xs text-text-code leading-relaxed">{chatData.greeting}</span>
+            <WordReveal
+              text={chatData.greeting}
+              delay={0.15}
+              className="text-xs text-text-code leading-relaxed"
+            />
           </div>
 
           {/* Pills inline */}
@@ -193,48 +198,58 @@ const About = () => {
             </div>
           </div>
 
-          <div className="h-px bg-linear-to-r from-accent/30 via-default-border to-transparent" />
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: DURATION.slow, ease: EASE, delay: 0.3 }}
+            className="h-px origin-left bg-linear-to-r from-accent/30 via-default-border to-transparent"
+          />
         </motion.div>
 
         {/* Transcript */}
         <motion.div
+          ref={transcriptRef}
+          role="log"
+          aria-live="polite"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.12, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: DURATION.base, delay: 0.12, ease: EASE }}
           className="flex-1 overflow-y-auto scrollbar-hide px-4 sm:px-6 py-3 flex flex-col gap-3"
         >
           {transcript.length === 0 && !isTyping && (
             <div className="flex-1 flex items-center justify-center">
               <p className="text-xs font-mono text-text-secondary/50">
-                <span className="text-accent animate-pulse">▍</span>
+                <span className="text-accent motion-safe:animate-pulse">▍</span>
                 {" "}aguardando seleção
               </p>
             </div>
           )}
 
-          <AnimatePresence>
-            {transcript.map((entry, i) => (
+          {transcript.map((entry, i) => (
+            <div key={entry.id} className="flex flex-col gap-0">
+              {i > 0 && <hr className="border-default-border/20 mb-3" />}
               <motion.div
-                key={entry.id}
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.25 }}
-                className="flex flex-col gap-0"
+                transition={{ duration: DURATION.base, ease: EASE }}
+                className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm"
               >
-                {i > 0 && <hr className="border-default-border/20 mb-3" />}
-                <div className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm">
-                  <span className="font-mono text-xs">
-                    <span className="text-accent mr-2">&gt;</span>
-                    <span className="text-text-primary">{entry.question}</span>
-                  </span>
-                </div>
-                <div className="border-l border-default-border/30 px-3 py-2">
-                  <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
-                  <span className="text-text-code text-xs leading-relaxed">{entry.answer}</span>
-                </div>
+                <span className="font-mono text-xs">
+                  <span className="text-accent mr-2">&gt;</span>
+                  <span className="text-text-primary">{entry.question}</span>
+                </span>
               </motion.div>
-            ))}
-          </AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: DURATION.base, ease: EASE, delay: 0.12 }}
+                className="border-l border-default-border/30 px-3 py-2"
+              >
+                <span className="font-mono text-[10px] text-text-secondary mr-2">//</span>
+                <span className="text-text-code text-xs leading-relaxed">{entry.answer}</span>
+              </motion.div>
+            </div>
+          ))}
 
           {isTyping && (
             <motion.div
@@ -244,20 +259,19 @@ const About = () => {
               className="bg-accent/5 border-l-2 border-accent px-3 py-2 rounded-sm"
             >
               <span className="font-mono text-xs text-accent">
-                &gt; <span className="animate-pulse">▍</span>
+                &gt; <span className="motion-safe:animate-pulse">▍</span>
               </span>
             </motion.div>
           )}
-
-          <div ref={transcriptEndRef} />
         </motion.div>
 
         {/* Footer */}
         <div className="shrink-0 border-t border-default-border/40 px-4 sm:px-6 py-2.5 flex items-center justify-between">
-          <span className="text-[10px] text-text-secondary font-mono">
+          <span className="text-[10px] text-text-secondary font-mono tabular-nums">
             {answeredCount}/{chatData.questions.length} respondidas
           </span>
           <button
+            type="button"
             onClick={handleReset}
             className="text-[10px] font-mono text-accent/50 hover:text-accent transition-colors cursor-pointer"
           >

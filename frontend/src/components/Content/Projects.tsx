@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Layers, Code2, Sparkles, Cpu } from "lucide-react";
 import {
@@ -9,6 +9,9 @@ import {
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
 import ContentLayout from "./Layout/ContentLayout";
+import MobileSectionHeader from "./Layout/MobileSectionHeader";
+import { CountUp, DURATION, EASE, Magnetic, SPRING, Stagger, StaggerItem } from "../motion";
+import { TEXT_CONTRAST, useBrandColor } from "../theme";
 
 const GitHubIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -167,226 +170,241 @@ const tabIcons: Record<ProjectCategory, React.ElementType> = {
 
 const categoryChipColors: Record<string, string> = {
   "Full Stack": "bg-accent/10 text-accent border-accent/20",
-  Frontend: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  Backend: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Frontend: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20 light:text-cyan-800 light:border-cyan-800/25",
+  Backend: "bg-blue-500/10 text-blue-400 border-blue-500/20 light:text-blue-800 light:border-blue-800/25",
 };
 
-const ProjectDetail = ({ project }: { project: Project }) => (
-  <motion.div
-    key={project.id}
-    initial={{ opacity: 0, x: 8 }}
-    animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.2 }}
-    className="p-5"
-  >
-    {project.image && (
-      <div className="w-full h-36 mb-4 rounded-sm overflow-hidden border border-default-border/40">
-        <img
-          src={project.image}
-          alt={project.title}
-          className="w-full h-full object-cover opacity-80"
-        />
-      </div>
-    )}
+const ProjectDetail = ({ project }: { project: Project }) => {
+  const brandColor = useBrandColor();
+  // Cor do projeto ajustada para contraste de texto no tema claro
+  const tone = brandColor(project.color, TEXT_CONTRAST);
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 8 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -8 }}
+      transition={{ duration: DURATION.fast, ease: EASE }}
+      className="p-5"
+    >
+      {project.image && (
+        <div className="group w-full h-36 mb-4 rounded-sm overflow-hidden border border-default-border/40">
+          <img
+            src={project.image}
+            alt={project.title}
+            loading="lazy"
+            decoding="async"
+            width={800}
+            height={288}
+            className="w-full h-full object-cover opacity-80 transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        </div>
+      )}
 
-    <div className="h-0.5 w-12 mb-3 rounded-full" style={{ backgroundColor: project.color }} />
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: DURATION.slow, ease: EASE, delay: 0.1 }}
+        className="h-0.5 w-12 mb-3 rounded-full origin-left"
+        style={{ backgroundColor: tone }}
+      />
 
-    <h2 className="text-xl font-bold text-text-primary mb-1">{project.title}</h2>
+      <h2 className="text-xl font-bold text-text-primary mb-1">{project.title}</h2>
 
-    <div className="flex items-center gap-2 mb-4">
-      <span className={`font-mono text-[9px] px-2 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
-        {project.category}
-      </span>
-      <span className="font-mono text-[10px] text-text-muted">{project.year}</span>
-    </div>
-
-    {/* Action bar */}
-    {(project.github || project.demo) && (
       <div className="flex items-center gap-2 mb-4">
-        {project.github && (
-          <a
-            href={project.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 border border-default-border/60 rounded-sm font-mono text-[10px] text-text-secondary hover:border-accent/40 hover:text-accent transition-colors"
-          >
-            <GitHubIcon className="w-3 h-3" />
-            <span>GitHub</span>
-          </a>
-        )}
-        {project.demo && (
-          <a
-            href={project.demo}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[10px] font-semibold transition-opacity hover:opacity-80"
-            style={{
-              backgroundColor: project.color + "22",
-              border: `1px solid ${project.color}55`,
-              color: project.color,
-            }}
-          >
-            <ExternalLink size={11} />
-            <span>Demo</span>
-          </a>
-        )}
-      </div>
-    )}
-
-    <div className="h-px bg-default-border/30 mb-4" />
-
-    <p className="text-xs text-text-muted leading-relaxed mb-5">{project.longDescription}</p>
-
-    <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-2">stack</p>
-    <div className="flex flex-wrap gap-2">
-      {project.tech.map((t) => {
-        const entry = techIconMap[t];
-        if (!entry) return null;
-        const Icon = entry.icon;
-        return (
-          <div
-            key={t}
-            className="flex items-center gap-1.5 px-2 py-1.5 border border-default-border/50 bg-background/50 rounded-sm hover:border-accent/30 transition-colors group"
-          >
-            <Icon size={13} style={{ color: entry.color }} />
-            <span className="font-mono text-[10px] text-text-muted group-hover:text-text-code transition-colors">{t}</span>
-          </div>
-        );
-      })}
-    </div>
-  </motion.div>
-);
-
-const MobileCard = ({ project, index }: { project: Project; index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.2, delay: index * 0.05 }}
-    className="rounded-sm overflow-hidden"
-    style={{ border: "1px solid var(--color-default-border)", backgroundColor: "var(--color-background)" }}
-  >
-    {project.image && (
-      <div className="relative w-full h-32 overflow-hidden">
-        <img
-          src={project.image}
-          alt={project.title}
-          className="w-full h-full object-cover"
-          style={{ opacity: 0.75 }}
-        />
-        {/* Gradient overlay bottom */}
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to bottom, transparent 40%, var(--color-background) 100%)" }}
-        />
-        {/* Featured badge */}
-        {project.featured && (
-          <div
-            className="absolute top-2 right-2 font-mono text-[9px] px-2 py-0.5 rounded-sm"
-            style={{ backgroundColor: "var(--color-accent-third)", color: "var(--color-accent)", border: "1px solid var(--color-default-border)" }}
-          >
-            ★ destaque
-          </div>
-        )}
-        {/* num */}
-        <span
-          className="absolute bottom-2 left-3 font-mono text-[10px]"
-          style={{ color: project.color }}
-        >
-          {project.num}
+        <span className={`font-mono text-[9px] px-2 py-0.5 border rounded-sm ${categoryChipColors[project.category]}`}>
+          {project.category}
         </span>
+        <span className="font-mono text-[10px] text-text-muted">{project.year}</span>
       </div>
-    )}
 
-    <div className="px-3 pt-2 pb-3">
-      {/* Color bar */}
-      <div className="h-0.5 w-8 mb-2 rounded-full" style={{ backgroundColor: project.color }} />
-
-      <div className="flex items-start justify-between gap-2 mb-1.5">
-        <p className="text-sm font-semibold text-text-primary leading-tight">{project.title}</p>
-        <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+      {/* Action bar */}
+      {(project.github || project.demo) && (
+        <div className="flex items-center gap-2 mb-4">
           {project.github && (
-            <a href={project.github} target="_blank" rel="noopener noreferrer">
-              <ExternalLink size={12} style={{ color: "var(--color-text-muted)" }} />
-            </a>
+            <Magnetic strength={0.2}>
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-default-border/60 rounded-sm font-mono text-[10px] text-text-secondary hover:border-accent/40 hover:text-accent transition-colors"
+              >
+                <GitHubIcon className="w-3 h-3" />
+                <span>GitHub</span>
+              </a>
+            </Magnetic>
           )}
           {project.demo && (
-            <a href={project.demo} target="_blank" rel="noopener noreferrer">
-              <ExternalLink size={12} style={{ color: "var(--color-accent)" }} />
-            </a>
+            <Magnetic strength={0.2}>
+              <a
+                href={project.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm font-mono text-[10px] font-semibold transition-opacity hover:opacity-80"
+                style={{
+                  backgroundColor: tone + "22",
+                  border: `1px solid ${tone}55`,
+                  color: tone,
+                }}
+              >
+                <ExternalLink size={11} />
+                <span>Demo</span>
+              </a>
+            </Magnetic>
           )}
         </div>
-      </div>
+      )}
 
-      <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-3">{project.description}</p>
+      <div className="h-px bg-default-border/30 mb-4" />
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          {project.tech.slice(0, 4).map((t) => {
-            const entry = techIconMap[t];
-            if (!entry) return null;
-            const Icon = entry.icon;
-            return <Icon key={t} size={13} style={{ color: entry.color }} />;
-          })}
-          {project.tech.length > 4 && (
-            <span className="font-mono text-[9px] text-text-muted">+{project.tech.length - 4}</span>
+      <p className="text-xs text-text-muted leading-relaxed mb-5">{project.longDescription}</p>
+
+      <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-2">stack</p>
+      <Stagger className="flex flex-wrap gap-2" delay={0.12} stagger={0.04}>
+        {project.tech.map((t) => {
+          const entry = techIconMap[t];
+          if (!entry) return null;
+          const Icon = entry.icon;
+          return (
+            <StaggerItem key={t}>
+              <div className="flex items-center gap-1.5 px-2 py-1.5 border border-default-border/50 bg-background/50 rounded-sm hover:border-accent/30 transition-colors group">
+                <Icon size={13} style={{ color: brandColor(entry.color) }} />
+                <span className="font-mono text-[10px] text-text-muted group-hover:text-text-code transition-colors">{t}</span>
+              </div>
+            </StaggerItem>
+          );
+        })}
+      </Stagger>
+    </motion.div>
+  );
+};
+
+const MobileCard = ({ project }: { project: Project }) => {
+  const brandColor = useBrandColor();
+  const tone = brandColor(project.color, TEXT_CONTRAST);
+  return (
+    <div className="rounded-sm overflow-hidden border border-default-border bg-background light:bg-card-background light:shadow-xs">
+      {project.image && (
+        <div className="relative w-full h-32 overflow-hidden">
+          <img
+            src={project.image}
+            alt={project.title}
+            loading="lazy"
+            decoding="async"
+            width={800}
+            height={256}
+            className="w-full h-full object-cover opacity-75"
+          />
+          {/* Gradient overlay bottom */}
+          <div className="absolute inset-0 bg-linear-to-b from-transparent from-40% to-background" />
+          {/* Featured badge */}
+          {project.featured && (
+            <div className="absolute top-2 right-2 font-mono text-[9px] px-2 py-0.5 rounded-sm bg-accent-third text-accent border border-default-border">
+              ★ destaque
+            </div>
           )}
+          {/* num */}
+          <span
+            className="absolute bottom-2 left-3 font-mono text-[10px]"
+            style={{ color: tone }}
+          >
+            {project.num}
+          </span>
         </div>
-        <span className="font-mono text-[9px] text-text-muted">{project.year}</span>
+      )}
+
+      <div className="px-3 pt-2 pb-3">
+        {/* Color bar */}
+        <div className="h-0.5 w-8 mb-2 rounded-full" style={{ backgroundColor: tone }} />
+
+        <div className="flex items-start justify-between gap-2 mb-1.5">
+          <p className="text-sm font-semibold text-text-primary leading-tight">{project.title}</p>
+          <div className="flex items-center gap-2.5 shrink-0 mt-0.5">
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Repositório de ${project.title} no GitHub`}
+                className="text-text-muted"
+              >
+                <GitHubIcon className="w-3 h-3" />
+              </a>
+            )}
+            {project.demo && (
+              <a
+                href={project.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Demo de ${project.title}`}
+                className="text-accent"
+              >
+                <ExternalLink size={12} />
+              </a>
+            )}
+          </div>
+        </div>
+
+        <p className="text-xs text-text-muted leading-relaxed line-clamp-2 mb-3">{project.description}</p>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            {project.tech.slice(0, 4).map((t) => {
+              const entry = techIconMap[t];
+              if (!entry) return null;
+              const Icon = entry.icon;
+              return <Icon key={t} size={13} style={{ color: brandColor(entry.color) }} />;
+            })}
+            {project.tech.length > 4 && (
+              <span className="font-mono text-[9px] text-text-muted">+{project.tech.length - 4}</span>
+            )}
+          </div>
+          <span className="font-mono text-[9px] text-text-muted">{project.year}</span>
+        </div>
       </div>
     </div>
-  </motion.div>
-);
+  );
+};
+
+const categoryCount = (cat: ProjectCategory) =>
+  cat === "All" ? projects.length : projects.filter((p) => p.category === cat).length;
 
 const Projects = () => {
+  const brandColor = useBrandColor();
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>("All");
-  const [selectedId, setSelectedId] = useState<number>(1);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const filteredProjects =
     activeCategory === "All" ? projects : projects.filter((p) => p.category === activeCategory);
 
-  useEffect(() => {
-    if (filteredProjects.length > 0) {
-      setSelectedId(filteredProjects[0].id);
-    }
-  }, [activeCategory]);
+  // Seleção derivada: se o projeto escolhido saiu do filtro, cai no primeiro da lista
+  const selectedProject =
+    filteredProjects.find((p) => p.id === selectedId) ?? filteredProjects[0] ?? projects[0];
 
-  const selectedProject = projects.find((p) => p.id === selectedId) ?? projects[0];
+  const changeCategory = (cat: ProjectCategory) => {
+    setActiveCategory(cat);
+    setSelectedId(null);
+  };
 
   return (
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg">
 
-        {/* Mobile header — System Panel */}
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="shrink-0 md:hidden"
-        >
-          <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="font-mono text-[10px] text-accent/40 tracking-widest">§04</span>
-              <span className="text-base font-bold text-text-primary tracking-tight">Projects</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="font-mono text-sm font-bold text-accent">{projects.length}</span>
+        <MobileSectionHeader
+          index="04"
+          title="Projects"
+          aside={
+            <>
+              <CountUp value={projects.length} delay={0.2} className="font-mono text-sm font-bold text-accent" />
               <span className="font-mono text-[10px] text-text-secondary ml-1">projetos</span>
-            </div>
-          </div>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="h-0.5 origin-left"
-            style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
-          />
-        </motion.div>
+            </>
+          }
+        />
 
         {/* Desktop header */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: DURATION.base, ease: EASE }}
           className="shrink-0 hidden md:block px-4 pt-3 pb-0"
         >
           <div className="flex items-center justify-between mb-3">
@@ -396,32 +414,37 @@ const Projects = () => {
               <span className="text-xs text-text-primary/40">Odair Michael Bendotti</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="font-mono font-bold text-accent text-xs">7</span>
+              <CountUp value={projects.length} delay={0.15} className="font-mono font-bold text-accent text-xs" />
               <span className="text-[10px] text-text-secondary">projetos</span>
             </div>
           </div>
 
           {/* Filter tabs — desktop only */}
-          <div className="flex items-center border-b border-default-border/40">
+          <div role="tablist" className="flex items-center border-b border-default-border/40">
             {categories.map((cat) => {
               const Icon = tabIcons[cat];
               const isActive = activeCategory === cat;
-              const count = cat === "All" ? projects.length : projects.filter((p) => p.category === cat).length;
               return (
                 <button
                   key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className="px-4 py-2.5 text-xs cursor-pointer flex items-center gap-2 border-b-2 transition-colors duration-150"
-                  style={{
-                    borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
-                    color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
-                  }}
-                  onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-primary)"; }}
-                  onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-secondary)"; }}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => changeCategory(cat)}
+                  className={`relative px-4 py-2.5 text-xs cursor-pointer flex items-center gap-2 transition-colors duration-150 ${
+                    isActive ? "text-accent" : "text-text-secondary hover:text-text-primary"
+                  }`}
                 >
                   <Icon size={13} />
                   <span>{cat}</span>
-                  <span className="font-mono text-[10px] text-accent/50">{count}</span>
+                  <span className="font-mono text-[10px] text-accent/50">{categoryCount(cat)}</span>
+                  {isActive && (
+                    <motion.span
+                      layoutId="projects-tab"
+                      transition={SPRING}
+                      className="absolute -bottom-px left-0 right-0 h-0.5 bg-accent"
+                    />
+                  )}
                 </button>
               );
             })}
@@ -435,59 +458,62 @@ const Projects = () => {
           <motion.div
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="hidden md:flex shrink-0 w-52 border-r border-default-border/40 flex-col py-2 overflow-y-auto scrollbar-hide"
+            transition={{ duration: DURATION.base, delay: 0.1, ease: EASE }}
+            className="hidden md:flex relative shrink-0 w-52 border-r border-default-border/40 flex-col py-2 overflow-y-auto scrollbar-hide"
           >
-            <AnimatePresence>
+            <AnimatePresence mode="popLayout">
               {filteredProjects.map((project, index) => {
-                const isActive = selectedId === project.id;
+                const isActive = selectedProject.id === project.id;
+                const tone = brandColor(project.color, TEXT_CONTRAST);
                 return (
                   <motion.button
                     key={project.id}
+                    type="button"
+                    layout
+                    aria-current={isActive ? "true" : undefined}
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -6 }}
-                    transition={{ duration: 0.2, delay: index * 0.04 }}
+                    exit={{ opacity: 0, x: -6, transition: { duration: 0.12 } }}
+                    transition={{
+                      duration: DURATION.fast,
+                      ease: EASE,
+                      delay: index * 0.04,
+                      layout: { duration: DURATION.base, ease: EASE },
+                    }}
                     onClick={() => setSelectedId(project.id)}
-                    className="flex flex-col py-2 px-4 cursor-pointer border-l-2 transition-colors duration-150 -ml-px text-left"
-                    style={{
-                      borderLeftColor: isActive ? project.color : "transparent",
-                      backgroundColor: isActive ? project.color + "0d" : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        const title = (e.currentTarget as HTMLElement).querySelector(".item-title") as HTMLElement;
-                        if (title) title.style.color = "var(--color-text-primary)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        const title = (e.currentTarget as HTMLElement).querySelector(".item-title") as HTMLElement;
-                        if (title) title.style.color = "var(--color-text-secondary)";
-                      }
-                    }}
+                    className="group relative flex flex-col py-2 px-4 cursor-pointer -ml-px text-left"
                   >
-                    <div className="flex items-center gap-2">
+                    {/* Indicador ativo desliza entre itens, na cor do projeto */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="projects-active"
+                        transition={SPRING}
+                        className="absolute inset-0 border-l-2"
+                        style={{ borderLeftColor: tone, backgroundColor: tone + "0d" }}
+                      />
+                    )}
+                    <div className="relative flex items-center gap-2">
                       <span
-                        className="font-mono text-[10px]"
-                        style={{ color: isActive ? project.color : "var(--color-text-muted)" }}
+                        className="font-mono text-[10px] transition-colors duration-150"
+                        style={{ color: isActive ? tone : "var(--color-text-muted)" }}
                       >
                         {project.num}
                       </span>
                       <span
                         className="text-[8px]"
-                        style={{ color: project.color, visibility: project.featured ? "visible" : "hidden" }}
+                        style={{ color: tone, visibility: project.featured ? "visible" : "hidden" }}
                       >
                         ●
                       </span>
                       <span
-                        className="item-title text-xs font-medium transition-colors duration-150"
-                        style={{ color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)" }}
+                        className={`text-xs font-medium transition-colors duration-150 ${
+                          isActive ? "text-accent" : "text-text-secondary group-hover:text-text-primary"
+                        }`}
                       >
                         {project.title}
                       </span>
                     </div>
-                    <div className="font-mono text-[9px] text-text-muted ml-8">
+                    <div className="relative font-mono text-[9px] text-text-muted ml-8">
                       {project.category} · {project.year}
                     </div>
                   </motion.button>
@@ -498,38 +524,61 @@ const Projects = () => {
 
           {/* Project detail — desktop */}
           <div className="hidden md:block flex-1 overflow-y-auto scrollbar-hide">
-            <ProjectDetail project={selectedProject} />
+            <AnimatePresence mode="wait" initial={false}>
+              <ProjectDetail key={selectedProject.id} project={selectedProject} />
+            </AnimatePresence>
           </div>
 
           {/* Mobile list */}
           <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide pb-24">
             {/* Mobile category filters */}
-            <div className="flex overflow-x-auto scrollbar-hide border-b border-default-border/40 px-4 gap-1">
+            <div role="tablist" className="flex overflow-x-auto scrollbar-hide border-b border-default-border/40 px-4 gap-1">
               {categories.map((cat) => {
                 const Icon = tabIcons[cat];
                 const isActive = activeCategory === cat;
-                const count = cat === "All" ? projects.length : projects.filter((p) => p.category === cat).length;
                 return (
                   <button
                     key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className="relative flex items-center gap-1.5 px-3 py-2.5 text-xs cursor-pointer shrink-0 border-b-2 transition-colors duration-150"
-                    style={{
-                      borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
-                      color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
-                    }}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => changeCategory(cat)}
+                    className={`relative flex items-center gap-1.5 px-3 py-2.5 text-xs cursor-pointer shrink-0 whitespace-nowrap transition-colors duration-150 ${
+                      isActive ? "text-accent" : "text-text-secondary"
+                    }`}
                   >
                     <Icon size={12} />
                     <span>{cat}</span>
-                    <span className="font-mono text-[10px] opacity-50">{count}</span>
+                    <span className="font-mono text-[10px] opacity-50">{categoryCount(cat)}</span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="projects-tab-mobile"
+                        transition={SPRING}
+                        className="absolute -bottom-px left-0 right-0 h-0.5 bg-accent"
+                      />
+                    )}
                   </button>
                 );
               })}
             </div>
-            <div className="px-4 pt-3 flex flex-col gap-3">
-              <AnimatePresence>
+            <div className="relative px-4 pt-3 flex flex-col gap-3">
+              <AnimatePresence mode="popLayout">
                 {filteredProjects.map((project, i) => (
-                  <MobileCard key={project.id} project={project} index={i} />
+                  <motion.div
+                    key={project.id}
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.12 } }}
+                    transition={{
+                      duration: DURATION.base,
+                      ease: EASE,
+                      delay: i * 0.05,
+                      layout: { duration: DURATION.base, ease: EASE },
+                    }}
+                  >
+                    <MobileCard project={project} />
+                  </motion.div>
                 ))}
               </AnimatePresence>
             </div>

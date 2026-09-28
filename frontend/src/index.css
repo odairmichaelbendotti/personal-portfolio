@@ -4,7 +4,7 @@
 .hachura {
   background-image: repeating-linear-gradient(
     45deg,
-    #141b22,
+    var(--color-pattern),
     1px,
     transparent 0,
     transparent 50%
@@ -14,8 +14,8 @@
 
 .quadriculado {
   background-image:
-    linear-gradient(#141b22 0.5px, transparent 1px),
-    linear-gradient(90deg, #141b22 1px, transparent 1px);
+    linear-gradient(var(--color-pattern) 0.5px, transparent 1px),
+    linear-gradient(90deg, var(--color-pattern) 1px, transparent 1px);
 
   background-size: 15px 15px;
 }
@@ -43,6 +43,7 @@
   --color-accent-third:    #141b22;
   --color-text-secondary:  #8fa0ad;
   --color-default-border:  #1e252c;
+  --color-pattern:         #141b22;
 
   --color-text-primary:    #ffffff;
   --color-text-code:       #d1d5db;
@@ -55,35 +56,36 @@
   --font-inter: "inter", sans-serif;
 }
 
+/* Altura do painel desktop (Sidebar e ContentLayout): 660px, mas nunca maior que a viewport
+   menos as duas faixas decorativas de 24px da Sidebar — evita scroll vertical em telas baixas */
+@utility h-panel {
+  height: min(41.25rem, calc(100dvh - 3rem));
+}
+
+/* Tema claro "Grafite": tinta sobre papel neutro, sem cor de acento — a cor fica nos ícones */
 @variant light {
-  --color-background:      #e8e0d4;
-  --color-card-background: #f2ede6;
-  --color-content-bg:      #f2ede6;
-  --color-accent:          #7c5c2e;
-  --color-accent-secondary:#5a3e18;
-  --color-accent-third:    #ddd5c8;
-  --color-text-secondary:  #4a3828;
-  --color-default-border:  #c4b8a8;
-  --color-text-primary:    #1a1208;
-  --color-text-code:       #2e1f0e;
-  --color-text-muted:      #7a6a58;
+  --color-background:      #e7e7ea;
+  --color-card-background: #fcfcfc;
+  --color-content-bg:      #f4f4f5;
+  --color-accent:          #18181b;
+  --color-accent-secondary:#3f3f46;
+  --color-accent-third:    #e4e4e7;
+  --color-text-secondary:  #52525b;
+  --color-default-border:  #d4d4d8;
+  --color-pattern:         #d4d4d8;
+  --color-text-primary:    #09090b;
+  --color-text-code:       #27272a;
+  --color-text-muted:      #6b6b74;
+  --color-success:         #15803d;
 }
 
 /* ─── Light mode body override ──────────────────────────────────────────────── */
 
+/* Grade de pontos no lugar das estrelas e da nebulosa do tema escuro */
 .light body {
-  background-color: #e8e0d4;
-  background-image:
-    radial-gradient(
-      ellipse 70% 55% at 8% 12%,
-      rgba(124, 92, 46, 0.05) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 60% 50% at 92% 88%,
-      rgba(90, 62, 24, 0.03) 0%,
-      transparent 100%
-    );
+  background-color: var(--color-background);
+  background-image: radial-gradient(var(--color-pattern) 1px, transparent 1.2px);
+  background-size: 16px 16px;
   background-attachment: fixed;
 }
 
@@ -91,28 +93,12 @@
   display: none;
 }
 
-.light .hachura {
-  background-image: repeating-linear-gradient(
-    45deg,
-    #c4b8a8,
-    1px,
-    transparent 0,
-    transparent 50%
-  );
-}
-
-.light .quadriculado {
-  background-image:
-    linear-gradient(#c4b8a8 0.5px, transparent 1px),
-    linear-gradient(90deg, #c4b8a8 1px, transparent 1px);
-}
-
 /* ─── Deep Space Background ─────────────────────────────────────────────────── */
 
 body {
   font-family: var(--font-inter);
-  overflow-x: hidden;
-  background-color: #07090c;
+  overflow-x: clip;
+  background-color: var(--color-background);
 
   background-image:
     /* Vignette */
@@ -196,7 +182,7 @@ body::after {
 /* ─── Scrollbar ─────────────────────────────────────────────────────────────── */
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 ::-webkit-scrollbar {
@@ -215,7 +201,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2ab8d9;
+  background: color-mix(in srgb, var(--color-accent) 80%, white);
 }
 
 /* Firefox */
