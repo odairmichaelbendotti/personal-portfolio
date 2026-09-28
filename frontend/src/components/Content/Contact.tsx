@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from "react";
 import ContentLayout from "./Layout/ContentLayout";
+import MobileSectionHeader from "./Layout/MobileSectionHeader";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { DURATION, EASE, Magnetic, Stagger, StaggerItem } from "../motion";
+import { useBrandColor } from "../theme";
 import { Copy, Check, ArrowUpRight } from "lucide-react";
 import { SiGithub, SiYoutube, SiWhatsapp, SiGmail } from "react-icons/si";
 import { FaLinkedinIn } from "react-icons/fa";
@@ -38,59 +41,96 @@ const socialLinks = [
   },
 ];
 
-const now = new Date();
-const localTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+const COPIED_FEEDBACK_MS = 2000;
 
-const Contact = () => {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
+const formatTime = (date: Date) =>
+  `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 
-  const handleCopy = async (text: string, field: string) => {
+// Hora local calculada no mount e atualizada a cada 30s (antes ficava congelada no carregamento do módulo)
+const useLocalTime = () => {
+  const [time, setTime] = useState(() => formatTime(new Date()));
+  useEffect(() => {
+    const id = setInterval(() => setTime(formatTime(new Date())), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  return time;
+};
+
+const CopyButton = ({ value, variant }: { value: string; variant: "card" | "inline" }) => {
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
+  const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(text);
-      setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000);
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
     } catch {
       // clipboard not available
     }
   };
 
-  const isCopied = (field: string) => copiedField === field;
+  const isCard = variant === "card";
+  const iconSize = isCard ? 12 : 10;
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className={`flex items-center justify-center font-mono border rounded-sm cursor-pointer transition-colors duration-150 ${
+        isCard ? "flex-1 gap-2 text-xs py-2" : "gap-1.5 text-[10px] px-2 py-0.5"
+      } ${
+        copied
+          ? "border-success/40 text-success"
+          : "border-default-border text-text-secondary hover:border-accent/30 hover:text-accent"
+      }`}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={copied ? "check" : "copy"}
+          className="flex"
+          initial={{ scale: 0, rotate: -45 }}
+          animate={{ scale: 1, rotate: 0 }}
+          exit={{ scale: 0, rotate: 45 }}
+          transition={{ duration: 0.15, ease: EASE }}
+        >
+          {copied ? <Check size={iconSize} /> : <Copy size={iconSize} />}
+        </motion.span>
+      </AnimatePresence>
+      <span aria-live="polite">{copied ? "copiado" : "copiar"}</span>
+    </button>
+  );
+};
+
+const Contact = () => {
+  const localTime = useLocalTime();
+  const brandColor = useBrandColor();
 
   return (
     <ContentLayout>
       <div className="h-full w-full flex flex-col overflow-hidden bg-content-bg pb-20 md:pb-0">
 
-        {/* Mobile header — System Panel */}
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="shrink-0 md:hidden"
-        >
-          <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="font-mono text-[10px] text-accent/40 tracking-widest">§05</span>
-              <span className="text-base font-bold text-text-primary tracking-tight">Contact</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-              <span className="font-mono text-[10px] text-text-secondary">disponível</span>
-            </div>
-          </div>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="h-0.5 origin-left"
-            style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
-          />
-        </motion.div>
+        <MobileSectionHeader
+          index="05"
+          title="Contact"
+          aside={
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-success motion-safe:animate-pulse" />
+              <span className="font-mono text-[10px] text-text-secondary ml-0.5">disponível</span>
+            </>
+          }
+        />
 
         {/* Desktop header slim */}
         <motion.div
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: DURATION.base, ease: EASE }}
           className="shrink-0 hidden md:block px-4 py-3"
         >
           <div className="flex items-center justify-between">
@@ -100,290 +140,197 @@ const Contact = () => {
               <span className="text-xs text-text-primary/40">Odair Michael Bendotti</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-success motion-safe:animate-pulse" />
               <span className="font-mono text-[10px] text-text-secondary">disponível</span>
             </div>
           </div>
-          <div className="mt-3 h-px bg-linear-to-r from-accent/30 via-default-border to-transparent" />
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: DURATION.slow, ease: EASE, delay: 0.1 }}
+            className="mt-3 h-px origin-left bg-linear-to-r from-accent/30 via-default-border to-transparent"
+          />
         </motion.div>
 
         {/* ── MOBILE BODY ─────────────────────────────────────────── */}
-        <div className="md:hidden flex-1 overflow-y-auto scrollbar-hide px-4 py-5 flex flex-col gap-4">
+        <Stagger
+          className="md:hidden flex-1 overflow-y-auto scrollbar-hide px-4 py-5 flex flex-col gap-4"
+          delay={0.08}
+          stagger={0.08}
+        >
 
           <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">
             // contato direto
           </p>
 
           {/* Email card */}
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: 0.08 }}
-            className="rounded-sm border p-4 flex flex-col gap-3"
-            style={{ borderColor: "var(--color-default-border)", backgroundColor: "var(--color-background)" }}
-          >
+          <StaggerItem className="rounded-sm border border-default-border bg-background light:bg-card-background light:shadow-xs p-4 flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
               <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">mailto://</span>
               <span className="font-mono text-sm font-medium text-text-primary">{directContact.email}</span>
             </div>
-            <div className="flex gap-2 border-t pt-3" style={{ borderColor: "var(--color-default-border)" }}>
-              <button
-                onClick={() => handleCopy(directContact.email, "email")}
-                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
-                style={{
-                  borderColor: isCopied("email") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
-                  color: isCopied("email") ? "var(--color-success)" : "var(--color-text-secondary)",
-                }}
-              >
-                <AnimatePresence mode="wait">
-                  {isCopied("email") ? (
-                    <motion.span key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Check size={12} />
-                    </motion.span>
-                  ) : (
-                    <motion.span key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Copy size={12} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-                {isCopied("email") ? "copiado" : "copiar"}
-              </button>
+            <div className="flex gap-2 border-t border-default-border pt-3">
+              <CopyButton value={directContact.email} variant="card" />
               <a
                 href={`mailto:${directContact.email}`}
-                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
-                style={{ borderColor: "var(--color-default-border)", color: "var(--color-text-secondary)" }}
+                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border border-default-border rounded-sm cursor-pointer text-text-secondary transition-colors duration-150"
               >
                 <SiGmail size={12} />
                 enviar →
               </a>
             </div>
-          </motion.div>
+          </StaggerItem>
 
           {/* Phone card */}
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: 0.16 }}
-            className="rounded-sm border p-4 flex flex-col gap-3"
-            style={{ borderColor: "var(--color-default-border)", backgroundColor: "var(--color-background)" }}
-          >
+          <StaggerItem className="rounded-sm border border-default-border bg-background light:bg-card-background light:shadow-xs p-4 flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
               <span className="font-mono text-[9px] text-accent/40 uppercase tracking-widest">wa.me//</span>
               <span className="font-mono text-sm font-medium text-text-primary">{directContact.phone}</span>
             </div>
-            <div className="flex gap-2 border-t pt-3" style={{ borderColor: "var(--color-default-border)" }}>
-              <button
-                onClick={() => handleCopy(directContact.phone, "phone")}
-                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
-                style={{
-                  borderColor: isCopied("phone") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
-                  color: isCopied("phone") ? "var(--color-success)" : "var(--color-text-secondary)",
-                }}
-              >
-                <AnimatePresence mode="wait">
-                  {isCopied("phone") ? (
-                    <motion.span key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Check size={12} />
-                    </motion.span>
-                  ) : (
-                    <motion.span key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Copy size={12} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-                {isCopied("phone") ? "copiado" : "copiar"}
-              </button>
+            <div className="flex gap-2 border-t border-default-border pt-3">
+              <CopyButton value={directContact.phone} variant="card" />
               <a
                 href={`https://wa.me/${directContact.whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border rounded-sm cursor-pointer transition-colors duration-150"
-                style={{ borderColor: "var(--color-default-border)", color: "var(--color-text-secondary)" }}
+                className="flex-1 flex items-center justify-center gap-2 font-mono text-xs py-2 border border-default-border rounded-sm cursor-pointer text-text-secondary transition-colors duration-150"
               >
                 <SiWhatsapp size={12} />
                 abrir chat →
               </a>
             </div>
-          </motion.div>
+          </StaggerItem>
 
           {/* Sociais divider */}
-          <div className="flex items-center gap-3">
+          <StaggerItem className="flex items-center gap-3">
             <div className="h-px flex-1 bg-default-border/30" />
             <span className="font-mono text-[9px] text-accent/30 uppercase tracking-widest">sociais</span>
             <div className="h-px flex-1 bg-default-border/30" />
-          </div>
+          </StaggerItem>
 
           {/* Social grid 3 cols */}
-          <div className="grid grid-cols-3 gap-3">
-            {socialLinks.map((link, index) => {
+          <StaggerItem className="grid grid-cols-3 gap-3">
+            {socialLinks.map((link) => {
               const Icon = link.icon;
               return (
-                <motion.a
+                <a
                   key={link.id}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: 0.3 + index * 0.06 }}
-                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-sm border cursor-pointer"
-                  style={{ borderColor: "var(--color-default-border)", backgroundColor: "var(--color-background)" }}
+                  className="flex flex-col items-center justify-center gap-2 py-4 rounded-sm border border-default-border bg-background light:bg-card-background light:shadow-xs cursor-pointer active:scale-95 transition-transform"
                 >
-                  <Icon size={22} style={{ color: link.color }} />
+                  <Icon size={22} style={{ color: brandColor(link.color) }} />
                   <span className="font-mono text-[10px] text-text-secondary">{link.name}</span>
-                </motion.a>
+                </a>
               );
             })}
-          </div>
+          </StaggerItem>
 
-        </div>
+        </Stagger>
 
         {/* ── DESKTOP BODY ────────────────────────────────────────── */}
-        <div className="hidden md:block flex-1 overflow-y-auto scrollbar-hide px-4 py-5">
+        <Stagger className="hidden md:block flex-1 overflow-y-auto scrollbar-hide px-4 py-5" delay={0.08} stagger={0.08}>
 
-          <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-5">
-            // presence log
-          </p>
+          <StaggerItem>
+            <p className="font-mono text-[9px] text-accent/40 uppercase tracking-widest mb-5">
+              // presence log
+            </p>
+          </StaggerItem>
 
           {/* Email entry */}
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.08 }}
-          >
+          <StaggerItem>
             <div className="flex items-baseline gap-0">
-              <span className="w-12 shrink-0 font-mono text-[10px] text-accent/50">{localTime}</span>
+              <span className="w-12 shrink-0 font-mono text-[10px] text-accent/50 tabular-nums">{localTime}</span>
               <span className="w-24 shrink-0 font-mono text-[10px] text-text-secondary/60">mailto://</span>
               <span className="font-mono text-xs text-text-primary truncate flex-1">{directContact.email}</span>
             </div>
             <div className="mt-1.5 ml-36 flex items-center gap-2">
-              <button
-                onClick={() => handleCopy(directContact.email, "email")}
-                className="flex items-center gap-1.5 font-mono text-[10px] px-2 py-0.5 border rounded-sm cursor-pointer transition-colors duration-150"
-                style={{
-                  borderColor: isCopied("email") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
-                  color: isCopied("email") ? "var(--color-success)" : "var(--color-text-secondary)",
-                }}
-                onMouseEnter={(e) => { if (!isCopied("email")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)"; (e.currentTarget as HTMLElement).style.color = "var(--color-accent)"; } }}
-                onMouseLeave={(e) => { if (!isCopied("email")) { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-default-border)"; (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; } }}
-              >
-                <AnimatePresence mode="wait">
-                  {isCopied("email") ? (
-                    <motion.span key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Check size={10} />
-                    </motion.span>
-                  ) : (
-                    <motion.span key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Copy size={10} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-                {isCopied("email") ? "copiado" : "copiar"}
-              </button>
-              <a
-                href={`mailto:${directContact.email}`}
-                className="flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 border border-default-border/60 rounded-sm cursor-pointer text-text-secondary transition-colors duration-150 hover:border-accent/30 hover:text-accent"
-              >
-                <SiGmail size={10} />
-                enviar →
-              </a>
+              <CopyButton value={directContact.email} variant="inline" />
+              <Magnetic strength={0.25}>
+                <a
+                  href={`mailto:${directContact.email}`}
+                  className="flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 border border-default-border/60 rounded-sm cursor-pointer text-text-secondary transition-colors duration-150 hover:border-accent/30 hover:text-accent"
+                >
+                  <SiGmail size={10} />
+                  enviar →
+                </a>
+              </Magnetic>
             </div>
-          </motion.div>
+          </StaggerItem>
 
           <div className="h-px bg-default-border/20 my-4" />
 
           {/* Phone entry */}
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.16 }}
-          >
+          <StaggerItem>
             <div className="flex items-baseline gap-0">
               <span className="w-12 shrink-0 font-mono text-[10px] text-accent/50">24/7</span>
               <span className="w-24 shrink-0 font-mono text-[10px] text-text-secondary/60">wa.me//</span>
               <span className="font-mono text-xs text-text-primary truncate flex-1">{directContact.phone}</span>
             </div>
             <div className="mt-1.5 ml-36 flex items-center gap-2">
-              <button
-                onClick={() => handleCopy(directContact.phone, "phone")}
-                className="flex items-center gap-1.5 font-mono text-[10px] px-2 py-0.5 border rounded-sm cursor-pointer transition-colors duration-150"
-                style={{
-                  borderColor: isCopied("phone") ? "rgba(40,167,69,0.4)" : "var(--color-default-border)",
-                  color: isCopied("phone") ? "var(--color-success)" : "var(--color-text-secondary)",
-                }}
-                onMouseEnter={(e) => { if (!isCopied("phone")) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,203,246,0.3)"; (e.currentTarget as HTMLElement).style.color = "var(--color-accent)"; } }}
-                onMouseLeave={(e) => { if (!isCopied("phone")) { (e.currentTarget as HTMLElement).style.borderColor = "var(--color-default-border)"; (e.currentTarget as HTMLElement).style.color = "var(--color-text-secondary)"; } }}
-              >
-                <AnimatePresence mode="wait">
-                  {isCopied("phone") ? (
-                    <motion.span key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Check size={10} />
-                    </motion.span>
-                  ) : (
-                    <motion.span key="copy" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                      <Copy size={10} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-                {isCopied("phone") ? "copiado" : "copiar"}
-              </button>
-              <a
-                href={`https://wa.me/${directContact.whatsapp}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 border border-default-border/60 rounded-sm cursor-pointer text-text-secondary transition-colors duration-150 hover:border-green-500/30 hover:text-green-400"
-              >
-                <SiWhatsapp size={10} />
-                abrir chat →
-              </a>
+              <CopyButton value={directContact.phone} variant="inline" />
+              <Magnetic strength={0.25}>
+                <a
+                  href={`https://wa.me/${directContact.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 border border-default-border/60 rounded-sm cursor-pointer text-text-secondary transition-colors duration-150 hover:border-success/30 hover:text-success"
+                >
+                  <SiWhatsapp size={10} />
+                  abrir chat →
+                </a>
+              </Magnetic>
             </div>
-          </motion.div>
+          </StaggerItem>
 
           {/* Sociais divider */}
-          <div className="flex items-center gap-3 my-6">
+          <StaggerItem className="flex items-center gap-3 my-6">
             <div className="h-px flex-1 bg-default-border/30" />
             <span className="font-mono text-[9px] text-accent/30 uppercase tracking-widest">sociais</span>
             <div className="h-px flex-1 bg-default-border/30" />
-          </div>
+          </StaggerItem>
 
           {/* Social rows */}
           <div className="flex flex-col">
-            {socialLinks.map((link, index) => {
+            {socialLinks.map((link) => {
               const Icon = link.icon;
               return (
-                <motion.a
-                  key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, x: -4 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.25, delay: 0.3 + index * 0.06 }}
-                  className="group flex items-center gap-3 py-2 border-l-2 border-transparent pl-2 -ml-2 transition-all duration-150 hover:border-accent/40 cursor-pointer"
-                >
-                  <Icon size={11} style={{ color: link.color }} className="shrink-0" />
-                  <span className="font-mono text-xs text-text-secondary w-16 shrink-0 group-hover:text-text-primary transition-colors duration-150">
-                    {link.name}
-                  </span>
-                  <span className="font-mono text-xs text-text-muted flex-1 group-hover:text-accent transition-colors duration-150">
-                    {link.handle}
-                  </span>
-                  <ArrowUpRight
-                    size={13}
-                    className="text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0"
-                  />
-                </motion.a>
+                <StaggerItem key={link.id} x={-4} y={0}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 py-2 border-l-2 border-transparent pl-2 -ml-2 transition-colors duration-150 hover:border-accent/40 cursor-pointer"
+                  >
+                    <Icon
+                      size={11}
+                      style={{ color: brandColor(link.color) }}
+                      className="shrink-0 transition-transform duration-200 group-hover:scale-125"
+                    />
+                    <span className="font-mono text-xs text-text-secondary w-16 shrink-0 group-hover:text-text-primary transition-colors duration-150">
+                      {link.name}
+                    </span>
+                    <span className="font-mono text-xs text-text-muted flex-1 group-hover:text-accent transition-colors duration-150">
+                      {link.handle}
+                    </span>
+                    <ArrowUpRight
+                      size={13}
+                      className="text-text-secondary opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-200 shrink-0"
+                    />
+                  </a>
+                </StaggerItem>
               );
             })}
           </div>
 
-        </div>
+        </Stagger>
 
         {/* Footer — shared */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
+          transition={{ duration: DURATION.slow, delay: 0.5, ease: EASE }}
           className="shrink-0 border-t border-default-border/40 px-4 py-2.5"
         >
           <p className="font-mono text-[9px] text-text-secondary/60 text-center tracking-widest">

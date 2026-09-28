@@ -1,19 +1,6 @@
-import { useState, useEffect } from "react";
-
-const useIsLight = () => {
-  const [isLight, setIsLight] = useState(() =>
-    document.documentElement.classList.contains("light")
-  );
-  useEffect(() => {
-    const obs = new MutationObserver(() =>
-      setIsLight(document.documentElement.classList.contains("light"))
-    );
-    obs.observe(document.documentElement, { attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
-  return isLight;
-};
+import { useState } from "react";
 import ContentLayout from "./Layout/ContentLayout";
+import MobileSectionHeader from "./Layout/MobileSectionHeader";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Server,
@@ -52,6 +39,8 @@ import {
   SiGraphql,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa";
+import { CountUp, DURATION, EASE, SPRING, SpotlightLayer, useSpotlight } from "../motion";
+import { useBrandColor } from "../theme";
 
 type CategorySkill = "Backend" | "Frontend" | "Database" | "Infrastructure" | "All";
 
@@ -98,25 +87,14 @@ const skillList: Skill[] = [
   { name: "GitHub Actions",icon: SiGithubactions,iconColor: "#2088FF", category: "Infrastructure" },
 ];
 
-const iconColorLight: Record<string, string> = {
-  "JavaScript":   "#b8960a",
-  "React":        "#0ea5c8",
-  "Next.js":      "#1a1a1a",
-  "Express":      "#1a1a1a",
-  "Fastify":      "#1a1a1a",
-  "Socket.io":    "#1a1a1a",
-  "Swagger":      "#4a8a00",
-  "Prisma":       "#1a1a1a",
-};
-
 const categoryConfig: Record<
   Exclude<CategorySkill, "All">,
-  { icon: React.ElementType; color: string; description: string }
+  { icon: React.ElementType; description: string }
 > = {
-  Backend:        { icon: Server,   color: "bg-blue-500/10 text-blue-400 border-blue-500/30",    description: "Node.js, APIs REST, arquitetura de microsserviços" },
-  Frontend:       { icon: Layout,   color: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",    description: "React, interfaces responsivas, state management" },
-  Database:       { icon: Database, color: "bg-green-500/10 text-green-400 border-green-500/30", description: "SQL, NoSQL, caching, otimização de queries" },
-  Infrastructure: { icon: Cloud,    color: "bg-purple-500/10 text-purple-400 border-purple-500/30", description: "Docker, cloud services, CI/CD, devops" },
+  Backend:        { icon: Server,   description: "Node.js, APIs REST, arquitetura de microsserviços" },
+  Frontend:       { icon: Layout,   description: "React, interfaces responsivas, state management" },
+  Database:       { icon: Database, description: "SQL, NoSQL, caching, otimização de queries" },
+  Infrastructure: { icon: Cloud,    description: "Docker, cloud services, CI/CD, devops" },
 };
 
 const tabIcons: Record<CategorySkill, React.ElementType> = {
@@ -125,132 +103,89 @@ const tabIcons: Record<CategorySkill, React.ElementType> = {
 
 const categories: CategorySkill[] = ["All", "Backend", "Frontend", "Database", "Infrastructure"];
 
-const CornerBorders = ({ isActive }: { isActive: boolean }) => (
+const cornerClasses = [
+  "top-0 left-0 border-t border-l",
+  "top-0 right-0 border-t border-r",
+  "bottom-0 left-0 border-b border-l",
+  "bottom-0 right-0 border-b border-r",
+];
+
+const CornerBorders = () => (
   <>
-    <motion.span
-      className="absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-accent pointer-events-none"
-      animate={{ opacity: isActive ? 1 : 0 }}
-      transition={{ duration: 0.15 }}
-    />
-    <motion.span
-      className="absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-accent pointer-events-none"
-      animate={{ opacity: isActive ? 1 : 0 }}
-      transition={{ duration: 0.15 }}
-    />
-    <motion.span
-      className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-accent pointer-events-none"
-      animate={{ opacity: isActive ? 1 : 0 }}
-      transition={{ duration: 0.15 }}
-    />
-    <motion.span
-      className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-accent pointer-events-none"
-      animate={{ opacity: isActive ? 1 : 0 }}
-      transition={{ duration: 0.15 }}
-    />
+    {cornerClasses.map((pos) => (
+      <span
+        key={pos}
+        aria-hidden
+        className={`absolute ${pos} w-2.5 h-2.5 border-accent pointer-events-none opacity-0 transition-opacity duration-150 group-hover:opacity-100`}
+      />
+    ))}
   </>
 );
 
-const FeaturedSkillCard = ({ skill, index }: { skill: Skill; index: number }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const isLight = useIsLight();
-  const Icon = skill.icon;
-  const color = isLight ? (iconColorLight[skill.name] ?? skill.iconColor) : skill.iconColor;
+// Glow em camada separada: anima só opacity, sem repintar drop-shadow a cada frame
+const IconGlow = ({ color, size }: { color: string; size: string }) => (
+  <span
+    aria-hidden
+    className={`absolute ${size} rounded-full blur-lg opacity-0 transition-opacity duration-300 group-hover:opacity-40 light:group-hover:opacity-15 pointer-events-none`}
+    style={{ backgroundColor: color }}
+  />
+);
 
+const FeaturedSkillCard = ({ skill, color }: { skill: Skill; color: string }) => {
+  const Icon = skill.icon;
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="relative w-24 h-24 flex flex-col items-center justify-center gap-2 rounded-sm cursor-pointer shrink-0"
-      style={{
-        border: isHovered
-          ? "1px solid rgba(64,203,246,0.70)"
-          : "1px solid rgba(64,203,246,0.12)",
-        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-card-background)",
-        transition: "border-color 0.25s, background-color 0.25s",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <CornerBorders isActive={isHovered} />
-      <motion.div
-        animate={{
-          filter: isHovered
-            ? `drop-shadow(0 0 8px ${color})`
-            : "drop-shadow(0 0 0px transparent)",
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        <Icon size={32} style={{ color }} />
-      </motion.div>
-      <span
-        className="font-mono text-[10px]"
-        style={{
-          color: isHovered ? "var(--color-accent)" : "var(--color-text-muted)",
-          transition: "color 0.2s",
-        }}
-      >
+    <div className="group relative w-24 h-24 flex flex-col items-center justify-center gap-2 rounded-sm cursor-default border border-accent/12 bg-card-background light:shadow-xs transition-colors duration-250 hover:border-accent/70 hover:bg-accent-third">
+      <CornerBorders />
+      <span className="relative flex items-center justify-center">
+        <IconGlow color={color} size="w-10 h-10" />
+        <Icon size={32} style={{ color }} className="relative transition-transform duration-300 group-hover:scale-110" />
+      </span>
+      <span className="font-mono text-[10px] text-text-muted transition-colors duration-200 group-hover:text-accent">
         {skill.name}
       </span>
-    </motion.div>
+    </div>
   );
 };
 
-const SecondarySkillCard = ({ skill, index }: { skill: Skill; index: number }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const isLight = useIsLight();
+const SecondarySkillCard = ({ skill, color }: { skill: Skill; color: string }) => {
   const Icon = skill.icon;
-  const color = isLight ? (iconColorLight[skill.name] ?? skill.iconColor) : skill.iconColor;
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2, delay: index * 0.02 }}
-      className="relative flex flex-col items-center justify-center gap-1.5 rounded-sm cursor-pointer"
-      style={{
-        border: isHovered
-          ? "1px solid rgba(64,203,246,0.35)"
-          : "1px solid rgba(30,37,44,0.9)",
-        backgroundColor: isHovered ? "var(--color-accent-third)" : "var(--color-card-background)",
-        transition: "border-color 0.25s, background-color 0.25s",
-        aspectRatio: "1",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <motion.div
-        animate={{
-          filter: isHovered
-            ? `drop-shadow(0 0 5px ${color})`
-            : "drop-shadow(0 0 0px transparent)",
-        }}
-        transition={{ duration: 0.2 }}
-      >
-        <Icon size={22} style={{ color }} />
-      </motion.div>
-      <span
-        className="font-mono text-[9px]"
-        style={{
-          color: isHovered ? "var(--color-text-code)" : "var(--color-text-muted)",
-          transition: "color 0.2s",
-        }}
-      >
+    <div className="group relative aspect-square flex flex-col items-center justify-center gap-1.5 rounded-sm cursor-default border border-default-border/90 bg-card-background light:shadow-xs transition-colors duration-250 hover:border-accent/35 hover:bg-accent-third">
+      <span className="relative flex items-center justify-center">
+        <IconGlow color={color} size="w-7 h-7" />
+        <Icon size={22} style={{ color }} className="relative transition-transform duration-300 group-hover:scale-110" />
+      </span>
+      <span className="font-mono text-[9px] text-text-muted transition-colors duration-200 group-hover:text-text-code">
         {skill.name}
       </span>
-    </motion.div>
+    </div>
   );
 };
+
+const gridItemMotion = (index: number) => ({
+  layout: true,
+  initial: { opacity: 0, scale: 0.92 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.92, transition: { duration: 0.12 } },
+  transition: {
+    duration: DURATION.fast,
+    ease: EASE,
+    delay: index * 0.02,
+    layout: { duration: DURATION.base, ease: EASE },
+  },
+});
 
 const MobileCategoryCard = ({
   category,
   skills,
+  index,
   isExpanded,
   onToggle,
   resolveColor,
 }: {
   category: Exclude<CategorySkill, "All">;
   skills: Skill[];
+  index: number;
   isExpanded: boolean;
   onToggle: () => void;
   resolveColor: (skill: Skill) => string;
@@ -259,25 +194,27 @@ const MobileCategoryCard = ({
   const Icon = config.icon;
   const featured = skills.filter((s) => s.featured);
   const secondary = skills.filter((s) => !s.featured);
+  const panelId = `skills-panel-${category}`;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border border-default-border/60 rounded-sm overflow-hidden"
-      style={{ backgroundColor: "var(--color-background)" }}
+      transition={{ duration: DURATION.base, ease: EASE, delay: 0.1 + index * 0.06 }}
+      className="border border-default-border/60 rounded-sm overflow-hidden bg-background light:bg-card-background light:shadow-xs"
     >
       <button
+        type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer"
-        style={{ borderBottom: isExpanded ? "1px solid var(--color-default-border)" : "1px solid transparent" }}
+        aria-expanded={isExpanded}
+        aria-controls={panelId}
+        className={`w-full flex items-center justify-between px-4 py-3 cursor-pointer border-b transition-colors duration-200 ${
+          isExpanded ? "border-default-border" : "border-transparent"
+        }`}
       >
         <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 flex items-center justify-center rounded-sm shrink-0"
-            style={{ backgroundColor: "var(--color-accent-third)", border: "1px solid var(--color-default-border)" }}
-          >
-            <Icon className="w-4 h-4" style={{ color: "var(--color-accent)" } as React.CSSProperties} />
+          <div className="w-8 h-8 flex items-center justify-center rounded-sm shrink-0 bg-accent-third border border-default-border">
+            <Icon className="w-4 h-4 text-accent" />
           </div>
           <div className="text-left">
             <p className="text-xs font-semibold text-text-primary">{category}</p>
@@ -286,27 +223,36 @@ const MobileCategoryCard = ({
         </div>
         <div className="flex items-center gap-3">
           {/* Featured icons preview */}
-          {!isExpanded && (
-            <div className="flex items-center gap-1">
-              {featured.slice(0, 3).map((s) => {
-                const SI = s.icon;
-                return <SI key={s.name} size={13} style={{ color: resolveColor(s) }} />;
-              })}
-            </div>
-          )}
-          <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: 0.2 }}>
+          <AnimatePresence initial={false}>
+            {!isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, x: 6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 6 }}
+                transition={{ duration: DURATION.fast, ease: EASE }}
+                className="flex items-center gap-1"
+              >
+                {featured.slice(0, 3).map((s) => {
+                  const SI = s.icon;
+                  return <SI key={s.name} size={13} style={{ color: resolveColor(s) }} />;
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div animate={{ rotate: isExpanded ? 90 : 0 }} transition={{ duration: DURATION.fast, ease: EASE }}>
             <ChevronRight className="w-4 h-4 text-text-muted" />
           </motion.div>
         </div>
       </button>
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {isExpanded && (
           <motion.div
+            id={panelId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: DURATION.base, ease: EASE }}
             className="overflow-hidden"
           >
             <div className="px-4 pt-3 pb-4">
@@ -320,8 +266,7 @@ const MobileCategoryCard = ({
                       return (
                         <div
                           key={skill.name}
-                          className="flex items-center gap-2 px-3 py-2 rounded-sm border border-default-border/50"
-                          style={{ backgroundColor: "var(--color-card-background)" }}
+                          className="flex items-center gap-2 px-3 py-2 rounded-sm border border-default-border/50 bg-card-background"
                         >
                           <SkillIcon size={16} style={{ color: resolveColor(skill) }} />
                           <span className="text-xs text-text-code font-medium">{skill.name}</span>
@@ -341,8 +286,7 @@ const MobileCategoryCard = ({
                       return (
                         <div
                           key={skill.name}
-                          className="flex items-center gap-1.5 px-2 py-1.5 rounded-sm border border-default-border/40"
-                          style={{ backgroundColor: "var(--color-card-background)" }}
+                          className="flex items-center gap-1.5 px-2 py-1.5 rounded-sm border border-default-border/40 bg-card-background"
                         >
                           <SkillIcon size={12} style={{ color: resolveColor(skill) }} />
                           <span className="text-[10px] text-text-muted">{skill.name}</span>
@@ -364,8 +308,9 @@ const MobileCategoryCard = ({
 const Skills = () => {
   const [activeCategory, setActiveCategory] = useState<CategorySkill>("All");
   const [expandedMobileCategory, setExpandedMobileCategory] = useState<Exclude<CategorySkill, "All"> | null>("Backend");
-  const isLight = useIsLight();
-  const ic = (skill: Skill) => isLight ? (iconColorLight[skill.name] ?? skill.iconColor) : skill.iconColor;
+  const brandColor = useBrandColor();
+  const spotlight = useSpotlight();
+  const ic = (skill: Skill) => brandColor(skill.iconColor);
 
   const filteredSkills =
     activeCategory === "All"
@@ -397,37 +342,23 @@ const Skills = () => {
 
         {/* Mobile View */}
         <div className="md:hidden flex flex-col h-full overflow-hidden">
-          {/* Mobile header — System Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35 }}
-            className="shrink-0"
-          >
-            <div className="flex items-center justify-between px-4 pt-3 pb-2.5">
-              <div className="flex items-center gap-2.5">
-                <span className="font-mono text-[10px] text-accent/40 tracking-widest">§02</span>
-                <span className="text-base font-bold text-text-primary tracking-tight">Skills</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="font-mono text-sm font-bold text-accent">{skillList.length}</span>
+          <MobileSectionHeader
+            index="02"
+            title="Skills"
+            aside={
+              <>
+                <CountUp value={skillList.length} delay={0.2} className="font-mono text-sm font-bold text-accent" />
                 <span className="font-mono text-[10px] text-text-secondary ml-1">tecnologias</span>
-              </div>
-            </div>
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.4, delay: 0.15 }}
-              className="h-0.5 origin-left"
-              style={{ background: "linear-gradient(to right, #40cbf6, rgba(64,203,246,0.3), transparent)" }}
-            />
-          </motion.div>
+              </>
+            }
+          />
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-3 pb-24 scrollbar-hide">
-            {(Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]).map((category) => (
+            {(Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]).map((category, i) => (
               <MobileCategoryCard
                 key={category}
                 category={category}
                 skills={skillsByCategory[category]}
+                index={i}
                 isExpanded={expandedMobileCategory === category}
                 onToggle={() => toggleMobileCategory(category)}
                 resolveColor={ic}
@@ -443,69 +374,75 @@ const Skills = () => {
           <div className="flex flex-col flex-1 min-w-0 h-full">
 
             {/* Filter Tabs */}
-            <div className="shrink-0 flex border-b border-default-border/40">
+            <div role="tablist" className="shrink-0 flex border-b border-default-border/40">
               {categories.map((cat) => {
                 const TabIcon = tabIcons[cat];
                 const isActive = activeCategory === cat;
                 return (
                   <button
                     key={cat}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
                     onClick={() => setActiveCategory(cat)}
-                    className="relative flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer border-b-2 transition-colors duration-200"
-                    style={{
-                      color: isActive ? "var(--color-accent)" : "var(--color-text-secondary)",
-                      borderBottomColor: isActive ? "var(--color-accent)" : "transparent",
-                    }}
-                    onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-primary)"; }}
-                    onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLButtonElement).style.color = "var(--color-text-secondary)"; }}
+                    className={`relative flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer transition-colors duration-200 ${
+                      isActive ? "text-accent" : "text-text-secondary hover:text-text-primary"
+                    }`}
                   >
                     <TabIcon className="w-3.5 h-3.5" />
                     <span>{cat}</span>
                     <span className="font-mono text-[10px] text-accent/50">{categoryCount(cat)}</span>
+                    {isActive && (
+                      <motion.span
+                        layoutId="skills-tab"
+                        transition={SPRING}
+                        className="absolute -bottom-px left-0 right-0 h-0.5 bg-accent"
+                      />
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            {/* Skill Grid */}
-            <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
-              <motion.div
-                key={activeCategory}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.18 }}
-                className="flex flex-col gap-4"
-              >
-                {/* Featured row */}
-                {featuredSkills.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {featuredSkills.map((skill, i) => (
-                      <FeaturedSkillCard key={skill.name} skill={skill} index={i} />
-                    ))}
+            {/* Skill Grid — holofote segue o cursor por cima dos cards */}
+            <div className="relative flex-1 min-h-0 overflow-hidden" {...spotlight.handlers}>
+              <div className="h-full overflow-y-auto scrollbar-hide p-4">
+                <div className="flex flex-col gap-4">
+                  {/* Featured row */}
+                  <div className="relative flex flex-wrap gap-2">
+                    <AnimatePresence mode="popLayout">
+                      {featuredSkills.map((skill, i) => (
+                        <motion.div key={skill.name} {...gridItemMotion(i)}>
+                          <FeaturedSkillCard skill={skill} color={ic(skill)} />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
-                )}
 
-                {/* Divider */}
-                {featuredSkills.length > 0 && secondarySkills.length > 0 && (
-                  <div className="flex items-center gap-3">
-                    <div className="h-px flex-1 bg-default-border/30" />
-                    <span className="font-mono text-[9px] text-text-secondary/40 uppercase tracking-widest">demais</span>
-                    <div className="h-px flex-1 bg-default-border/30" />
-                  </div>
-                )}
+                  {/* Divider */}
+                  {featuredSkills.length > 0 && secondarySkills.length > 0 && (
+                    <motion.div layout transition={{ duration: DURATION.base, ease: EASE }} className="flex items-center gap-3">
+                      <div className="h-px flex-1 bg-default-border/30" />
+                      <span className="font-mono text-[9px] text-text-secondary/40 uppercase tracking-widest">demais</span>
+                      <div className="h-px flex-1 bg-default-border/30" />
+                    </motion.div>
+                  )}
 
-                {/* Secondary grid — uniform cells */}
-                {secondarySkills.length > 0 && (
-                  <div
-                    className="grid gap-2"
-                    style={{ gridTemplateColumns: "repeat(auto-fill, minmax(72px, 1fr))" }}
-                  >
-                    {secondarySkills.map((skill, i) => (
-                      <SecondarySkillCard key={skill.name} skill={skill} index={featuredSkills.length + i} />
-                    ))}
+                  {/* Secondary grid — uniform cells */}
+                  <div className="relative grid gap-2 grid-cols-[repeat(auto-fill,minmax(72px,1fr))]">
+                    <AnimatePresence mode="popLayout">
+                      {secondarySkills.map((skill, i) => (
+                        <motion.div key={skill.name} {...gridItemMotion(featuredSkills.length + i)}>
+                          <SecondarySkillCard skill={skill} color={ic(skill)} />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
-                )}
-              </motion.div>
+                </div>
+              </div>
+              <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden light:opacity-50">
+                <SpotlightLayer layer={spotlight.layer} />
+              </div>
             </div>
 
             {/* Context Footer */}
@@ -515,7 +452,7 @@ const Skills = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.18 }}
+                  transition={{ duration: DURATION.fast, ease: EASE }}
                   className="shrink-0 border-t border-default-border/30 px-4 py-2.5 flex items-center gap-2"
                 >
                   {(() => {
@@ -523,9 +460,9 @@ const Skills = () => {
                     return <FooterIcon className="w-3.5 h-3.5 text-accent/60 shrink-0" />;
                   })()}
                   <span className="font-mono text-xs text-accent/80">{activeCategory}</span>
-                  <span className="text-default-border/60 text-xs">·</span>
+                  <span className="text-text-muted/60 text-xs">·</span>
                   <span className="text-[10px] text-text-secondary">{activeConfig.description}</span>
-                  <span className="text-default-border/60 text-xs">·</span>
+                  <span className="text-text-muted/60 text-xs">·</span>
                   <span className="font-mono text-[10px] text-accent/50 shrink-0">
                     {filteredSkills.length} tecnologias
                   </span>
@@ -537,14 +474,14 @@ const Skills = () => {
 
           {/* Right: Índice Contextual Sidebar */}
           <div className="shrink-0 w-48 border-l border-default-border/40 flex flex-col overflow-hidden">
-            <AnimatePresence mode="popLayout">
+            <AnimatePresence mode="wait" initial={false}>
               {activeCategory === "All" ? (
                 <motion.div
                   key="all"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
+                  initial={{ opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: DURATION.fast, ease: EASE }}
                   className="flex flex-col h-full"
                 >
                   {/* Header */}
@@ -555,7 +492,7 @@ const Skills = () => {
 
                   {/* Category summaries */}
                   <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-3 flex flex-col gap-4">
-                    {(Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]).map((cat) => {
+                    {(Object.keys(skillsByCategory) as Exclude<CategorySkill, "All">[]).map((cat, i) => {
                       const cfg = categoryConfig[cat];
                       const CatIcon = cfg.icon;
                       const featured = skillsByCategory[cat].filter((s) => s.featured);
@@ -564,9 +501,10 @@ const Skills = () => {
                           key={cat}
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2 }}
+                          transition={{ duration: DURATION.fast, ease: EASE, delay: i * 0.05 }}
                         >
                           <button
+                            type="button"
                             onClick={() => setActiveCategory(cat)}
                             className="w-full flex items-center gap-2 mb-2 group cursor-pointer"
                           >
@@ -596,10 +534,10 @@ const Skills = () => {
               ) : (
                 <motion.div
                   key={activeCategory}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
+                  initial={{ opacity: 0, x: 8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: DURATION.fast, ease: EASE }}
                   className="flex flex-col h-full"
                 >
                   {/* Header */}
@@ -629,7 +567,7 @@ const Skills = () => {
                           key={skill.name}
                           initial={{ opacity: 0, x: 8 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.18, delay: i * 0.05 }}
+                          transition={{ duration: DURATION.fast, ease: EASE, delay: i * 0.05 }}
                           className="flex items-center gap-2.5 py-1.5 border-b border-default-border/20 last:border-0"
                         >
                           <div className="w-6 h-6 flex items-center justify-center shrink-0">
@@ -664,6 +602,7 @@ const Skills = () => {
                   {/* Back to all */}
                   <div className="shrink-0 px-4 py-3 border-t border-default-border/30">
                     <button
+                      type="button"
                       onClick={() => setActiveCategory("All")}
                       className="font-mono text-[10px] text-text-secondary hover:text-accent transition-colors duration-150 cursor-pointer"
                     >
